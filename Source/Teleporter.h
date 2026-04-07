@@ -17,16 +17,11 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
-#endif
-
 //------------------------------------------------------------------------------
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
+//typedef struct Entity Entity;
 
 //------------------------------------------------------------------------------
 // Public Consts:
@@ -50,8 +45,3 @@ typedef struct Entity Entity;
 void TeleporterUpdateEntity(Entity* entity);
 
 //------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-}                       /* End of extern "C" { */
-#endif
-

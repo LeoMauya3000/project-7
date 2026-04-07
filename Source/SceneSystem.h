@@ -17,9 +17,6 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef __cplusplus
-extern "C" {	// Assume C declarations for C++.
-#endif
 
 //------------------------------------------------------------------------------
 // Forward References:
@@ -69,7 +66,5 @@ void SceneSystemSetNext(const Scene* scene);
 
 /*----------------------------------------------------------------------------*/
 
-#ifdef __cplusplus
-}                       // End of extern "C" {
-#endif
+
 

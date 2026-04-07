@@ -25,10 +25,6 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
-#endif
 
 //------------------------------------------------------------------------------
 // Forward References:
@@ -117,7 +113,4 @@ float Vector2DToAngleRad(const Vector2D* pVec);
 
 //------------------------------------------------------------------------------
 
-#ifdef __cplusplus
-}                       /* End of extern "C" { */
-#endif
 
