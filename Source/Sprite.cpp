@@ -48,21 +48,30 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
-
-void SpriteRead(Sprite* sprite, Stream stream)
+Sprite::~Sprite()
 {
-	const SpriteSource* spriteLibrary = NULL;
-	const Mesh* meshLibrary = NULL;
-	sprite->frameIndex = StreamReadInt(stream);
-	sprite->alpha = StreamReadFloat(stream);
-	const char * token = StreamReadToken(stream);
-	meshLibrary = MeshLibraryBuild(token);
-	SpriteSetMesh(sprite,meshLibrary);
-	const char* nameToken = StreamReadToken(stream);
-	spriteLibrary = SpriteSourceLibraryBuild(nameToken);
-	SpriteSetSpriteSource(sprite, spriteLibrary);
+
+	delete this->spriteSource;
+	this->spriteSource = NULL;
+	delete this->mesh;
+	this->mesh = NULL;
 }
-void SpriteRender(const Sprite* sprite, Transform* transform)
+
+
+
+
+
+void Sprite::SpriteRead(Stream stream)
+{
+	//removed sprite and mesh variables and passed
+	this->frameIndex = StreamReadInt(stream);
+	this->alpha = StreamReadFloat(stream);
+	const char * token = StreamReadToken(stream);
+	this->mesh = MeshLibraryBuild(token);
+	const char* nameToken = StreamReadToken(stream);
+	this->spriteSource = SpriteSourceLibraryBuild(nameToken);
+}
+void Sprite::Render(Transform* transform)const
 {
 	 Matrix2D matrix = *TransformGetMatrix(transform);
 

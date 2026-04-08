@@ -99,7 +99,7 @@ void Mesh::MeshBuildSpaceship()
 	this->meshResource = DGL_Graphics_EndMesh();
 
 }
-void Mesh::MeshRender()
+void Mesh::Render()const
 {
 	if (this->meshResource)
 	{

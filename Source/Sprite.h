@@ -61,6 +61,8 @@ public:
 	void SpriteSetSpriteSource(SpriteSource* spriteSource);
 
 	void SpriteSetText(const char* text);
+	void Render() const override{};
+
 
 
 private:

@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 
 typedef struct Physics Physics;
-typedef struct Transform Transform;
+class Transform;
 typedef struct DGL_Vec2 Vector2D;
 struct _iobuf;
 typedef struct _iobuf FILE;

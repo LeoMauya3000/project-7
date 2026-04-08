@@ -186,8 +186,11 @@ Entity Entity::EntityRead(Stream stream)
 		if (!strncmp(token, "Animation", _countof("Animation")))
 		{
 			Animation * animation;
-			EntityAddComponent(animation);
-		 
+			if (animation)
+			{
+				EntityAddComponent(animation);
+			}
+			
 	    }
 		
 		

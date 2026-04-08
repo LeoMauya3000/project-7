@@ -38,7 +38,7 @@ typedef FILE* Stream;
 
 // You are free to change the contents of this structure as long as you do not
 //   change the public interface declared in the header.
-class  Mesh
+class  Mesh : public Component
 {
     public:
 	Mesh() : meshResource(NULL), drawMode(DGL_DM_TRIANGLELIST)
@@ -56,7 +56,7 @@ class  Mesh
 
 	bool MeshIsNamed(const char* name);
 
-	void MeshRender();
+	void Render() const override {};
 
 	~Mesh();
 

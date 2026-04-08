@@ -13,8 +13,9 @@ public:
 	
 	enum  TypeEnum
 	{
-		cTransform, cPhysics, cSprite, cAnimation, cBehavior, cCollider
+		cTransform, cPhysics, cSprite, cAnimation, cBehavior, cCollider, DEFAULT
 	};
+	Component():mType(DEFAULT),mParent(NULL){};
 	Component(TypeEnum type) : mType(type), mParent(nullptr) {}
 	Component::TypeEnum Type() const { return mType; }
 	virtual ~Component() = 0;
