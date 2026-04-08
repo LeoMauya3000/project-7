@@ -18,7 +18,7 @@ public:
 	Component():mType(DEFAULT),mParent(NULL){};
 	Component(TypeEnum type) : mType(type), mParent(nullptr) {}
 	Component::TypeEnum Type() const { return mType; }
-	virtual ~Component() = 0;
+	virtual ~Component() = 0 {};
 
 	void Parent(Entity* parent) { mParent = parent;}
 	Entity* Parent() const { return mParent; }

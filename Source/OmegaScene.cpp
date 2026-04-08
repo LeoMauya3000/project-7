@@ -109,7 +109,8 @@ static void OmegaSceneLoad(void)
 // Initialize the entities and variables used by the scene.
 static void OmegaSceneInit()
 {   
-	DGL_Graphics_SetBackgroundColor(&(DGL_Color){ 0,0,0,0 });
+	DGL_Color color = { 0,0,0,0 };
+	DGL_Graphics_SetBackgroundColor(&color);
 	DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
 	
 	OmegaSceneSpawnAsteroidWave();

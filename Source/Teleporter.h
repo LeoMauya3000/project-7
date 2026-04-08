@@ -42,6 +42,8 @@
 // When an Entity goes off-screen, teleport it to the other side.
 // Params:
 //	 entity = Pointer to the Entity to be checked.
+
+class Entity;
 void TeleporterUpdateEntity(Entity* entity);
 
 //------------------------------------------------------------------------------

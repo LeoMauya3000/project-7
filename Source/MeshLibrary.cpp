@@ -98,8 +98,8 @@ const Mesh* MeshLibraryBuild(const char* meshName)
 			if (streamFile)
 			{
 				
-				Mesh* mesh = MeshCreate();
-				MeshRead(mesh, streamFile);
+				Mesh* mesh = new Mesh();
+				mesh->MeshRead(streamFile);
 				MeshLibraryAdd(mesh);
 				StreamClose(&streamFile);
 				return mesh;
@@ -116,7 +116,7 @@ void MeshLibraryFreeAll()
 	{
 		if (meshes.meshList[i])
 		{
-		  MeshFree(&meshes.meshList[i]);
+			delete meshes.meshList[i];
 		}
 	}
 	meshes.meshCount = 0;
@@ -127,7 +127,7 @@ static const Mesh* MeshLibraryFind(const char* meshName)
 	{
 		for (unsigned int i = 0; i < meshes.meshCount; i++)
 		{
-			if (MeshIsNamed(meshes.meshList[i], meshName))
+			if (meshes.meshList[i]->MeshIsNamed(meshName))
 			{
 				return meshes.meshList[i];
 			}

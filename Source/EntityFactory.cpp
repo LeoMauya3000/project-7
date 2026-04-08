@@ -31,7 +31,7 @@
 //------------------------------------------------------------------------------
 // Private Variables:
 //------------------------------------------------------------------------------
-static EntityContainer* archetypes;
+static EntityContainer* archetypes = new EntityContainer();
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ static EntityContainer* archetypes;
 Entity* EntityFactoryBuild(const char* filename)
 {
 	Stream streamFile;
-	Entity* entity;
+	Entity* entity = new Entity();
 	const char* token = NULL;
 
 	if (filename)

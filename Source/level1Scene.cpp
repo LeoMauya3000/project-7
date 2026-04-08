@@ -75,17 +75,17 @@ typedef struct Level1Scene
  static const float wallDistance = 462.0f;
  static const float CheckSquareDistance = (75.0f * 75.0f);
 
- static Entity* monkeyEntity;
- static Mesh* monkeyMesh;
- static Sprite* monkeySprite;
+ static Entity* monkeyEntity = new Entity();
+ static Mesh* monkeyMesh = new Mesh();
+ static Sprite* monkeySprite = new Sprite();
  static SpriteSource* monkeySpriteSourceIdle = new SpriteSource();
  static SpriteSource* monkeySpriteSourceWalk = new SpriteSource();
  static SpriteSource* monkeySpriteSourceJump = new SpriteSource();
  
- static Entity* livesTextEntity;
- static Mesh* textMesh;
- static Sprite* textSprite;
- static SpriteSource* textSpriteSource;
+ static Entity* livesTextEntity = new Entity();
+ static Mesh* textMesh = new Mesh();
+ static Sprite* textSprite = new Sprite();
+ static SpriteSource* textSpriteSource = new SpriteSource;
  Monkeystates monkeyState = MonkeyInvalid;
 
 
@@ -173,10 +173,10 @@ static void Level1SceneLoad(void)
 // Initialize the entities and variables used by the scene.
 static void Level1SceneInit(void)
 {
-
 	livesTextEntity = EntityFactoryBuild("MonkeyLivesText");
 	createdEntity = EntityFactoryBuild("PlanetBounce");
 	monkeyEntity = EntityFactoryBuild("Monkey");
+	
 	if (createdEntity)
 	{	
 		createdEntity->Has(Sprite)->SpriteSetMesh(createdMesh);
@@ -191,13 +191,13 @@ static void Level1SceneInit(void)
 	if (livesTextEntity)
 	{
 	   textSprite = livesTextEntity->Has(Sprite);
-	   SpriteSetMesh(textSprite, textMesh);
-	   SpriteSetSpriteSource(textSprite, textSpriteSource);
+	   textSprite->SpriteSetMesh(textMesh);
+	   textSprite->SpriteSetSpriteSource(textSpriteSource);
 	   sprintf_s(livesBuffer,sizeof(livesBuffer),"Lives: %d",instance.numLives);
-	   SpriteSetText(textSprite, livesBuffer);
+	   textSprite->SpriteSetText(livesBuffer);
 	}
-
-	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 1, 1, 1, 1 });
+	DGL_Color color = { 1, 1, 1, 1 };
+	DGL_Graphics_SetBackgroundColor(&color);
 	DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
 }
 
@@ -271,8 +271,8 @@ static void Level1SceneMovementController(Entity *entity)
 
 	if (physics && transform)
 	{
-		Vector2D velocity = *(PhysicsGetVelocity(physics));
-		Vector2D translation = *(TransformGetTranslation(transform));
+		Vector2D velocity = *physics->PhysicsGetVelocity();
+		Vector2D translation = *transform->TransformGetTranslation();
 	
 		if (DGL_Input_KeyDown(VK_LEFT))
 		{
@@ -303,29 +303,27 @@ static void Level1SceneMovementController(Entity *entity)
 		{
 			Level1SceneSetMonkeyState(entity, MonkeyJump);
 			velocity.y = jumpVelocity;
-			PhysicsSetAcceleration(EntityGetPhysics(entity), &gravityNormal);
-			
+			entity->Has(Physics)->PhysicsSetAcceleration(&gravityNormal);	
 		}
 		if (translation.y < groundHeight)
 		{
 			translation.y = groundHeight;
-	
-			TransformSetTranslation(EntityGetTransform(entity), &translation);
+			entity->Has(Transform)->TransformSetTranslation(&translation);
 			velocity.y = 0;
-			PhysicsSetAcceleration(EntityGetPhysics(entity), &gravityNone);
+			entity->Has(Physics)->PhysicsSetAcceleration(&gravityNone);
 			Level1SceneSetMonkeyState(entity, MonkeyIdle);	
 
 		
 		}
-	    PhysicsSetVelocity(EntityGetPhysics(entity),&velocity);
+		entity->Has(Physics)->PhysicsSetVelocity(&velocity);
 	}
 
 }
 
 static void Level1SceneSetMonkeyState(Entity* entity, Monkeystates newState)
 {
-	Sprite* monkeySpriteLocal = EntityGetSprite(entity);
-	Animation* monkeyAnimationComponent = EntityGetAnimation(entity);
+	Sprite* monkeySpriteLocal = entity->Has(Sprite);
+	Animation* monkeyAnimationComponent = entity->Has(Animation);
 
 
 	if (monkeyState != (Monkeystates)newState)
@@ -334,20 +332,19 @@ static void Level1SceneSetMonkeyState(Entity* entity, Monkeystates newState)
 		switch (newState)
 		{
 		    case MonkeyIdle:
-			SpriteSetMesh(monkeySpriteLocal, createdMesh);
-			SpriteSetSpriteSource(monkeySpriteLocal, monkeySpriteSourceIdle);
-			AnimationPlay(monkeyAnimationComponent, 1, 0.0f, false);
+				monkeySpriteLocal->SpriteSetMesh(createdMesh);
+				monkeySpriteLocal->SpriteSetSpriteSource(monkeySpriteSourceIdle);
+				monkeyAnimationComponent->AnimationPlay(1, 0.0f, false);
 			break;
 	     	case MonkeyWalk:
-			SpriteSetMesh(monkeySpriteLocal, monkeyMesh);
-			SpriteSetSpriteSource(monkeySpriteLocal, monkeySpriteSourceWalk);
-			AnimationPlay(monkeyAnimationComponent, 8, 0.05f, true);
-	
+				monkeySpriteLocal->SpriteSetMesh(monkeyMesh);
+				monkeySpriteLocal->SpriteSetSpriteSource(monkeySpriteSourceWalk);
+				monkeyAnimationComponent->AnimationPlay(8, 0.05f, true);
 			break;
 		    case MonkeyJump:
-			SpriteSetMesh(monkeySpriteLocal, createdMesh);
-			SpriteSetSpriteSource(monkeySpriteLocal, monkeySpriteSourceJump);
-			AnimationPlay(monkeyAnimationComponent, 1, 0.0f, false);
+				monkeySpriteLocal->SpriteSetMesh(createdMesh);
+				monkeySpriteLocal->SpriteSetSpriteSource(monkeySpriteSourceJump);
+				monkeyAnimationComponent->AnimationPlay(1, 0.0f, false);
 			break;
 			default: break;
 		}
@@ -362,14 +359,14 @@ static void Level1SceneSetMonkeyState(Entity* entity, Monkeystates newState)
 
 static void Level1SceneBounceController(Entity* entity)
 {
-	Physics *entityPhysics = EntityGetPhysics(entity);
-	Transform* entityTransform = EntityGetTransform(entity);
+	Physics* entityPhysics = entity->Has(Physics);
+	Transform* entityTransform = entity->Has(Transform);
 
 
 	if (entityPhysics && entityTransform)	
 	{
-		Vector2D position = *TransformGetTranslation(entityTransform);
-		Vector2D velocity = *PhysicsGetVelocity(entityPhysics);
+		Vector2D position = *entityTransform->TransformGetTranslation();
+		Vector2D velocity = *entityPhysics->PhysicsGetVelocity();
 		if (position.x <= -wallDistance)
 		{
 			position.x = -wallDistance;
@@ -386,16 +383,16 @@ static void Level1SceneBounceController(Entity* entity)
 			velocity.y = -velocity.y;
 		}
 
-		PhysicsSetVelocity(entityPhysics,&velocity);
-		TransformSetTranslation(entityTransform, &position);
+		entityPhysics->PhysicsSetVelocity(&velocity);
+		entityTransform->TransformSetTranslation(&position);
 	}
 
 }
 static bool Level1SceneIsColliding(const Entity* entityA, const Entity* entityB)
 {
-	Vector2D entityPositionA = *TransformGetTranslation(EntityGetTransform(entityA));
-	Vector2D entityPositionB = *TransformGetTranslation(EntityGetTransform(entityB));
-
+	
+	Vector2D entityPositionA = *entityA->Has(Transform)->TransformGetTranslation();
+	Vector2D entityPositionB = *entityB->Has(Transform)->TransformGetTranslation();
 
 	if (Vector2DSquareDistance(&entityPositionA, &entityPositionB) <= CheckSquareDistance)
 	{

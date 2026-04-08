@@ -14,6 +14,7 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Transform.h"
+#include "Collider.h"
 //#include "Collider.h"
 #define MAXENTITYENTRY 100
 //------------------------------------------------------------------------------
@@ -38,7 +39,7 @@
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
-
+bool ColliderIsColliding(const Collider* collider, const Collider* other);
 // Initialize the ...
 void EntityContainerInit()
 {
@@ -58,19 +59,10 @@ void EntityContainerExit()
 {
 }
 
-EntityContainer::EntityContainer()
-{
-		this->entityMax = MAXENTITYENTRY;
-		for (auto& entity : entities)
-		{
-			entity = 0;
-		}
-		/*for (int i = 0; i < MAXENTITYENTRY; i++)
-		{
-			this->entities[i] = 0;
-		}*/
-	
-}
+//EntityContainer::EntityContainer()
+//{
+//
+//}
  EntityContainer::~EntityContainer()
 {
 	 EntityContainerFreeAll();
@@ -81,7 +73,7 @@ bool EntityContainer::EntityContainerAddEntity(Entity* entity)
 	 {
 		 if (this->entityCount < this->entityMax)
 		 {
-			 this->entities[this->entityCount] = entity;
+			 this->entities.push_back(entity);
 
 			 if (this->entities[this->entityCount])
 			 {
@@ -163,6 +155,24 @@ void EntityContainer::EntityContainerFreeAll()
 	}
 }
 
+void EntityContainer::ColliderCheck(const Collider* collider, const Collider* other)
+{
+	if (collider && other)
+	{
+		if (ColliderIsColliding(collider, other))
+		{
+			if (collider->ReturnHandler())
+			{
+				collider->ReturnHandler()(collider->Parent(), other->Parent());
+			}
+			if (other->ReturnHandler())
+			{
+				other->ReturnHandler()(other->Parent(), collider->Parent());
+			}
+		}
+	}
+}
+
 void EntityContainer::EntityContainerCheckCollisions()
 {
 
@@ -190,7 +200,7 @@ void EntityContainer::EntityContainerCheckCollisions()
 
 						if (entityA && entityB)
 						{
-							ColliderCheck(entityA->Has(Collider), entityB->Has(Collider));
+							this->ColliderCheck(entityA->Has(Collider), entityB->Has(Collider));
 							entityB = NULL;
 						}
 					}

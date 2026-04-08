@@ -34,7 +34,7 @@ void Transform::TransformRead(Stream stream)
 		StreamReadVector2D(stream, &(this->scale));
 	}
 }
-const Vector2D* Transform::TransformGetTranslation()
+const Vector2D* Transform::TransformGetTranslation() const
 {
 	if (this)
 	{
@@ -44,7 +44,7 @@ const Vector2D* Transform::TransformGetTranslation()
 	return NULL;
 }
 
-float Transform::TransformGetRotation()
+float Transform::TransformGetRotation() const
 {
 	if (this)
 	{
@@ -53,7 +53,7 @@ float Transform::TransformGetRotation()
 	return 0;
 }
 
-const Vector2D* Transform::TransformGetScale()
+const Vector2D* Transform::TransformGetScale() const
 {
 	// Verify that a valid transform was specified.
 	if (this)
@@ -68,11 +68,11 @@ const Vector2D* Transform::TransformGetScale()
 // Params:
 //	 transform = Pointer to the Transform component.
 //	 translation = Pointer to the new translation.
-void Transform::TransformSetTranslation(const Vector2D* translation)
+void Transform::TransformSetTranslation(const Vector2D* _translation)
 {
 	if (this)
 	{
-		this->translation = *translation;
+		this->translation = *_translation;
 		this->isDirty = true;
 	}
 	
@@ -82,12 +82,12 @@ void Transform::TransformSetTranslation(const Vector2D* translation)
 // Params:
 //	 transform = Pointer to the Transform component.
 //	 rotation = The rotation value (in radians).
-void Transform::TransformSetRotation(float rotation)
+void Transform::TransformSetRotation(float _rotation)
 {
 	// Verify that a valid transform was specified.
 	if (this)
 	{
-		this->rotation = rotation;
+		this->rotation = _rotation;
 		this->isDirty = true;
 	}
 }
@@ -96,12 +96,12 @@ void Transform::TransformSetRotation(float rotation)
 // Params:
 //	 transform = Pointer to the Transform component.
 //	 translation = Pointer to the new scale.
-void Transform::TransformSetScale(const Vector2D * scale)
+void Transform::TransformSetScale(const Vector2D * _scale)
 {
 	// Verify that a valid transform was specified.
 	if (this)
 	{
-		this->scale = *scale;
+		this->scale = *_scale;
 		this->isDirty = true;
 	}
 }
@@ -119,6 +119,7 @@ const Matrix2D* Transform::TransformGetMatrix()
 	{
 		if (this->isDirty)
 		{
+
 			Matrix2DScale(&scaleMatrix,this->scale.x, this->scale.y);
 			Matrix2DRotRad(&rotaionMatrix, this->rotation);
 			Matrix2DTranslate(&translationMatrix, this->translation.x, this->translation.y);

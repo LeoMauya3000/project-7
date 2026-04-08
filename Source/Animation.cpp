@@ -47,7 +47,6 @@ Animation::~Animation()
 	this->frameDuration = 0;
 	this->isRunning = false;
 	this->isLooping = false;
-	this->mParent = NULL;
 }
 void Animation::AnimationRead(Stream stream)
 {
@@ -153,6 +152,11 @@ bool Animation::AnimationIsDone()
 		return;
 	}
 }
+
+ Animation* Animation::Clone()const
+ {
+	 return new Animation(*this);
+ }
 
 
 

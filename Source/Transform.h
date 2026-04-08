@@ -13,6 +13,7 @@
 #include "Component.h"
 #include "DGL.h"
 #include "Matrix2D.h"
+#include "Vector2D.h"
 
 //------------------------------------------------------------------------------
 // Include Files:
@@ -26,8 +27,6 @@
 // Forward References:
 //------------------------------------------------------------------------------
 class Entity;
-typedef struct DGL_Mat4 Matrix2D;
-typedef struct DGL_Vec2 Vector2D;
 struct _iobuf;
 typedef struct _iobuf FILE;
 typedef FILE* Stream;
@@ -42,7 +41,6 @@ typedef FILE* Stream;
 class  Transform : public Component
 {
     public:
-
 		Transform();
 		~Transform()override{};
 	      
@@ -52,11 +50,11 @@ class  Transform : public Component
 
 		const Matrix2D* TransformGetMatrix();
 
-		const Vector2D* TransformGetTranslation();
+		const Vector2D* TransformGetTranslation() const;
 
-		float TransformGetRotation();
+		float TransformGetRotation() const;
 
-		const Vector2D* TransformGetScale();
+		const Vector2D* TransformGetScale() const;
 
 		void TransformSetTranslation(const Vector2D* translation);
 

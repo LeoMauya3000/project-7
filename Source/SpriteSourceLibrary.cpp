@@ -100,9 +100,8 @@ const SpriteSource* SpriteSourceLibraryBuild(const char* spriteSourceName)
 				Stream streamFile = StreamOpen(buffer);
 				if (streamFile)
 				{
-
-					SpriteSource* spriteSource = SpriteSourceCreate();
-					SpriteSourceRead(spriteSource, streamFile);
+					SpriteSource* spriteSource = new SpriteSource();
+					spriteSource->SpriteSourceRead(streamFile);
 					SpriteSourceLibraryAdd(spriteSource);
 					StreamClose(&streamFile);
 					return spriteSource;
@@ -118,7 +117,7 @@ void SpriteSourceLibraryFreeAll()
 	{
 		if (sprites.spriteSourceList[i])
 		{
-			SpriteSourceFree(&sprites.spriteSourceList[i]);	
+			delete sprites.spriteSourceList[i];
 		}
 	}
 	sprites.spriteSourceCount = 0;
@@ -149,7 +148,7 @@ static const SpriteSource* SpriteSourceLibraryFind(const char* SpriteName)
 	{
 		for (unsigned int i = 0; i < sprites.spriteSourceCount; i++)
 		{
-			if (SpriteSourceIsNamed(sprites.spriteSourceList[i], SpriteName))
+			if (sprites.spriteSourceList[i]->SpriteSourceIsNamed(SpriteName))
 			{
 				return sprites.spriteSourceList[i];
 			}

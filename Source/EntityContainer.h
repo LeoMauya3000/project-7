@@ -11,6 +11,8 @@
 
 #pragma once
 #include <vector>
+#include "Component.h"
+#include "Collider.h"
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
@@ -25,7 +27,10 @@ class EntityContainer
 {
 public:
 
-	EntityContainer();
+	EntityContainer() : entityCount(0), entityMax(0)
+	{
+		entities.resize(entityMax, nullptr);
+	};
 	~EntityContainer();
 
 	bool EntityContainerAddEntity( Entity* entity);
@@ -42,7 +47,7 @@ public:
 
 	void EntityContainerFreeAll();
 
-
+	void ColliderCheck(const Collider* collider, const Collider* other);
 
 private:
 

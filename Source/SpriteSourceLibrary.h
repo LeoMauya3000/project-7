@@ -22,7 +22,7 @@
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct SpriteSource SpriteSource;
+ class SpriteSource;
 
 //------------------------------------------------------------------------------
 // Public Consts:

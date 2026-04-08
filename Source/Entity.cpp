@@ -172,29 +172,46 @@ void Entity::EntityRender()
 
 Entity& Entity::EntityClone(const Entity* other)
 {
-	if (other)
-	{
-		return *this = *other;
-	}
-
+		return *this = *other;	
 }
-Entity Entity::EntityRead(Stream stream)
+void Entity::EntityRead(Stream stream)
 {
 	const char* token = StreamReadToken(stream);
+	this->EntitySetName(token);
 	while (token)
 	{
-		if (!strncmp(token, "Animation", _countof("Animation")))
-		{
-			Animation * animation;
-			if (animation)
-			{
-				EntityAddComponent(animation);
-			}
-			
-	    }
-		
-		
 
+		if (!strncmp(token, "Transform", _countof("Transform")))
+		{
+			Transform* transform = new Transform();
+			transform->TransformRead(stream);
+			this->EntityAddComponent(transform);
+		}
+		else if (!strncmp(token, "Physics", _countof("Physics")))
+		{
+			Physics* physics = new Physics();
+			physics->PhysicsRead(stream);
+			this->EntityAddComponent(physics);
+		}
+		else if (!strncmp(token, "Sprite", _countof("Sprite")))
+		{
+			Sprite* sprite = new Sprite();
+			sprite->SpriteRead(stream);
+			this->EntityAddComponent(sprite);
+		}
+		else if (!strncmp(token, "Animation", _countof("Animation")))
+		{
+
+			Animation* animation = new Animation();
+			animation->AnimationRead(stream);
+			this->EntityAddComponent(animation);
+		}
+		else if (strcmp(token, "") == 0)
+		{
+			return;
+		}
+
+		token = StreamReadToken(stream);
 	}
 }
 void Entity::EntityDestroy()

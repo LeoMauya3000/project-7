@@ -56,7 +56,7 @@ class Entity
 
 	 Entity& EntityClone(const Entity* other);
 
-	 Entity EntityRead(Stream stream);
+	 void EntityRead(Stream stream);
 
 	 void EntityDestroy();
 
@@ -73,7 +73,7 @@ class Entity
 	 Component* Get(Component::TypeEnum type) const;
 
 	 template<typename type>
-	 type* GetComponent(Component::TypeEnum typeId)
+	 type* GetComponent(Component::TypeEnum typeId) const
 	 {
 		 return static_cast<type*>(Get(typeId));
 	 }

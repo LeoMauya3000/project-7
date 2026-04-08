@@ -35,11 +35,12 @@ class SpriteSource
 {
     public:
 
-		SpriteSource() : numCols(1), numRows(1)
+		SpriteSource() : numCols(1), numRows(1), texture(NULL)
 		{
+			
 			name[0] = '\0';
-			texture = NULL;
 		};
+
 
 		~SpriteSource();
 

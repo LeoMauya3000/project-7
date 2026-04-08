@@ -43,7 +43,6 @@ class Entity;
 class  Animation : public Component
 {
     private:
-	Entity* mParent;
 	unsigned int frameIndex;
 	unsigned int frameCount;
 	float frameDelay;
@@ -53,7 +52,7 @@ class  Animation : public Component
 	bool isDone;
 
     public:
-		Animation() : Component(Component::cAnimation), mParent(NULL), frameIndex(0),frameCount(0),frameDelay(0),frameDuration(0),isRunning(false),isLooping(false),
+		Animation() : Component(Component::cAnimation), frameIndex(0),frameCount(0),frameDelay(0),frameDuration(0),isRunning(false),isLooping(false),
 		 isDone(false){}
 
 		~Animation() override;
@@ -67,7 +66,7 @@ class  Animation : public Component
 		void AnimationPlay(int _frameCount, float _frameDuration, bool _isLooping);
 		 void Update(float dt) override;
 		 void Render() const override {};
-	   Animation* Clone() const override = 0;
+	   Animation* Clone() const override;
 		bool AnimationIsDone();
 		void AdvanceFrame();
 };

@@ -44,21 +44,21 @@
 static Vector2D screenSize;
 
 // Initialize the ...
-void TeleporterInit()
+ void TeleporterInit()
 {
 }
 
 // Update the ...
 // Params:
 //	 dt = Change in time (in seconds) since the last game loop.
-void TeleporterUpdate(float dt)
+ void TeleporterUpdate(float dt)
 {
 	/* Tell the compiler that the 'dt' variable is unused. */
 	UNREFERENCED_PARAMETER(dt);
 }
 
 // Shutdown the ...
-void TeleporterExit()
+ void TeleporterExit()
 {
 }
 
@@ -70,32 +70,32 @@ void TeleporterUpdateEntity(Entity* entity)
 		screenSize = DGL_Window_GetSize();
 		Vector2D windowHalfSize;
 		Vector2DScale(&windowHalfSize, &screenSize, 0.5f);
-		Physics* entityPhysics = EntityGetPhysics(entity);
-		Transform* entityTransform = EntityGetTransform(entity);
+		Physics* entityPhysics = entity->Has(Physics);
+		Transform* entityTransform = entity->Has(Transform);
 
 		if (entityPhysics && entityTransform)
 		{
-			Vector2D entityVelocity = *PhysicsGetVelocity(entityPhysics);
-			Vector2D entityPos = *TransformGetTranslation(entityTransform);
+			Vector2D entityVelocity = *entityPhysics->PhysicsGetVelocity();
+			Vector2D entityPos = *entityTransform->TransformGetTranslation();
 			if (entityVelocity.x > 0 && (entityPos.x > windowHalfSize.x))
 			{
 				entityPos.x = -entityPos.x;
-				TransformSetTranslation(entityTransform, &entityPos);
+				entityTransform->TransformSetTranslation(&entityPos);
 			}
 			if (entityVelocity.x < 0 && (entityPos.x < -windowHalfSize.x))
 			{
 				entityPos.x = -entityPos.x;
-				TransformSetTranslation(entityTransform, &entityPos);
+				entityTransform->TransformSetTranslation(&entityPos);
 			}
 			if (entityVelocity.y > 0 && (entityPos.y > windowHalfSize.y))
 			{
 				entityPos.y = -entityPos.y;
-				TransformSetTranslation(entityTransform, &entityPos);
+				entityTransform->TransformSetTranslation(&entityPos);
 			}
 			if (entityVelocity.y < 0 && (entityPos.y < -windowHalfSize.y))
 			{
 				entityPos.y = -entityPos.y;
-				TransformSetTranslation(entityTransform, &entityPos);
+				entityTransform->TransformSetTranslation(&entityPos);
 			}
 		}
 

@@ -46,13 +46,15 @@ class  Mesh
 		name[0] = '\0';
 	}
 
-	void MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vSize, const char* name);
+	void MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vSize, const char* _name);
 
 	void MeshBuildSpaceship();
 
 	void MeshRead(Stream stream);
 
-	bool MeshIsNamed(const char* name);
+	bool MeshIsNamed(const char* _name) const;
+
+	void MeshRender() const;
 
 	~Mesh();
 

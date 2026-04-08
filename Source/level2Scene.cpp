@@ -49,8 +49,8 @@ typedef struct level2Scene
 {
 	// WARNING: The base class must always be included first.
 	Scene	base;
-	 Mesh* createdMesh;
-	 Entity* createdEntity;
+	 Mesh* createdMesh = new Mesh();
+	 Entity* createdEntity = new Entity();
 
 	// Add any scene-specific variables second.
 
@@ -109,8 +109,8 @@ const Scene* level2SceneGetInstance(void)
 static void level2SceneLoad(void)
 {
 
-	instance.createdMesh = MeshCreate();
-	MeshBuildSpaceship(instance.createdMesh);
+
+	instance.createdMesh->MeshBuildSpaceship();
 
 
 }
@@ -121,15 +121,11 @@ static void level2SceneInit()
 	instance.createdEntity = EntityFactoryBuild("SpaceshipHoming");
 	if (instance.createdEntity)
 	{
-		
-		SpriteSetMesh(EntityGetSprite(instance.createdEntity), instance.createdMesh);
-		
+		instance.createdEntity->Has(Sprite)->SpriteSetMesh(instance.createdMesh);
 	}
-	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 0, 0, 0 });
+	DGL_Color  color = { 0,0,0 };
+	DGL_Graphics_SetBackgroundColor(&color);
 	DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
- 
-
-
 }
 
 // Update the the variables used by the scene.
@@ -139,18 +135,16 @@ static void level2SceneUpdate(float dt)
 {
 	// Tell the compiler that the 'dt' variable is unused.
 	Level2SceneMovementController(instance.createdEntity);
-	EntityUpdate(instance.createdEntity,dt);
+	instance.createdEntity->EntityUpdate(dt);
 
 
 	if (DGL_Input_KeyTriggered('Z'))
 	{
-	 
-		SpriteSetAlpha(EntityGetSprite(instance.createdEntity), 0.5f);
-
+		instance.createdEntity->Has(Sprite)->SpriteSetAlpha(0.5f);
 	}
 	if (DGL_Input_KeyTriggered('X'))
 	{
-		SpriteSetAlpha(EntityGetSprite(instance.createdEntity), 1.0f);
+		instance.createdEntity->Has(Sprite)->SpriteSetAlpha(1.0f);
 	}
 
 
@@ -162,25 +156,25 @@ static void level2SceneUpdate(float dt)
 // Render any objects associated with the scene.
 void level2SceneRender(void)
 {
-	EntityRender(instance.createdEntity);
+	instance.createdEntity->EntityRender();
 }
 
 // Free any objects associated with the scene.
 static void level2SceneExit()
 {
-	EntityFree(&instance.createdEntity);
+	delete instance.createdEntity;
 }
 
 // Unload any resources used by the scene.
 static void level2SceneUnload(void)
 {
-	MeshFree(&instance.createdMesh);
+	// pretty sure this a double free
 }
 
 static void Level2SceneMovementController(Entity* entity)
 {
-	Physics* physics = EntityGetPhysics(entity);
-	Transform * transform = EntityGetTransform(entity);
+	Physics* physics = entity->Has(Physics);
+	Transform * transform = entity->Has(Transform);
 
 
 	if (physics && transform)
@@ -188,11 +182,11 @@ static void Level2SceneMovementController(Entity* entity)
 		const Vector2D worldPos = DGL_Input_GetMousePosition();
 		Vector2D mouse = DGL_Camera_ScreenCoordToWorld(&worldPos);
 		Vector2D direction = { 0,0 };
-		Vector2DSub(&direction, &mouse, TransformGetTranslation(transform));
+		Vector2DSub(&direction, &mouse, transform->TransformGetTranslation());
 		Vector2DNormalize(&direction, &direction);
-		TransformSetRotation(transform, Vector2DToAngleRad(&direction));
+		transform->TransformSetRotation(Vector2DToAngleRad(&direction));
 		Vector2DScale(&direction, &direction, spaceshipSpeed);
-		PhysicsSetVelocity(physics,&direction);
+		physics->PhysicsSetVelocity(&direction);
 	}
 }
 

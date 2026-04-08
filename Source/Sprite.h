@@ -45,7 +45,7 @@ class Sprite : public Component
 {
 
 public:
-	Sprite() : alpha(1) {};
+	Sprite() : alpha(1), mesh(NULL), spriteSource(NULL), frameIndex(0), text(NULL){};
 	~Sprite() override;
 
 	Sprite* Clone() const override;
@@ -63,7 +63,7 @@ public:
 	void SpriteSetSpriteSource(const SpriteSource* _spriteSource);
 
 	void SpriteSetText(const char* text);
-	void Render() const override{};
+	void Render() const override;
 
 
 

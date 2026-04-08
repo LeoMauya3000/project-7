@@ -45,7 +45,7 @@ class  Physics : public Component
 {
   public:
 
-	  Physics() {};
+	  Physics() :oldTranslation({ 0,0 }), acceleration({ 0,0 }), velocity({0,0}), rotationalVelocity(0),drag(0){};
 	  ~Physics() {};
 
 	  Physics* Clone() const override;
@@ -60,9 +60,9 @@ class  Physics : public Component
 
 	  const Vector2D* PhysicsGetOldTranslation() const;
 
-	  void PhysicsSetAcceleration( const Vector2D* acceleration);
+	  void PhysicsSetAcceleration( const Vector2D* _acceleration);
 
-	  void PhysicsSetVelocity(const Vector2D* velocity);
+	  void PhysicsSetVelocity(const Vector2D* _velocity);
 
 	  void PhysicsSetRotationalVelocity( float rotationalVelocity);
 

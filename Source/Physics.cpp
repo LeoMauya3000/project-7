@@ -43,13 +43,13 @@ const Vector2D* Physics::PhysicsGetOldTranslation() const
 	return &this->oldTranslation;
 	
 }
-void Physics::PhysicsSetAcceleration(const Vector2D* acceleration)
+void Physics::PhysicsSetAcceleration(const Vector2D* _acceleration)
 {
-	this->acceleration = *acceleration;
+	this->acceleration = *_acceleration;
 }
-void Physics::PhysicsSetVelocity( const Vector2D* velocity)
+void Physics::PhysicsSetVelocity( const Vector2D* _velocity)
 {
-	this->velocity = *velocity; 
+	this->velocity = *_velocity;
 }
 void Physics::Update(float dt)
 {
@@ -69,21 +69,18 @@ void Physics::Update(float dt)
 		this->Parent()->Has(Transform)->TransformSetRotation(transformRotaion);
 	}
 }
-Physics* Physics::Clone()const
-{
-	return new Physics(*this);
-}
+
 
 float Physics::PhysicsGetRotationalVelocity() const
 {
-	this->rotationalVelocity;
+	return this->rotationalVelocity;
 }
-void Physics::PhysicsSetRotationalVelocity(float rotationalVelocity)
+void Physics::PhysicsSetRotationalVelocity(float _rotationalVelocity)
 {
-		this->rotationalVelocity = rotationalVelocity;
+		this->rotationalVelocity = _rotationalVelocity;
 }
 
-void Physics::PhysicsSetDrag(float drag)
+void Physics::PhysicsSetDrag(float _drag)
 {
-	this->drag = drag;
+	this->drag = _drag;
 }

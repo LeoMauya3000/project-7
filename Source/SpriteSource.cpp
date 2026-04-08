@@ -45,13 +45,13 @@ SpriteSource::~SpriteSource()
 	DGL_Graphics_FreeTexture(&(this->texture));
 }
 
-void SpriteSource::SpriteSourceLoadTexture(int numCols, int numRows, const char* textureName)
+void SpriteSource::SpriteSourceLoadTexture(int _numCols, int _numRows, const char* textureName)
 {
 	char buffer[256];
 	sprintf_s(buffer, sizeof(buffer), "Assets/%s", textureName);
 	this->texture = DGL_Graphics_LoadTexture(buffer);
-	this->numRows = numRows;
-	this->numCols = numCols;
+	this->numRows = _numRows;
+	this->numCols = _numCols;
 
 }
 unsigned SpriteSource::SpriteSourceGetFrameCount() const
@@ -108,11 +108,11 @@ void SpriteSource::SpriteSourceRead(Stream stream)
 		}
 	}
 }
-bool  SpriteSource::SpriteSourceIsNamed(const char* name)const
+bool  SpriteSource::SpriteSourceIsNamed(const char* _name)const
 {
-	if (name)
+	if (_name)
 	{
-		if (strcmp(name, this->name) == 0)
+		if (strcmp(_name, this->name) == 0)
 		{
 			return true;
 		}

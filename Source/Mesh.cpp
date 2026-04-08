@@ -56,7 +56,7 @@ static const DGL_Vec2 Vertex_Pos_Blc = { -0.5f, -0.5f };
 
 
 
-void Mesh::MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vSize, const char* name)
+void Mesh::MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vSize, const char* _name)
 {
     DGL_Graphics_StartMesh();
 
@@ -85,7 +85,7 @@ void Mesh::MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vS
 
    
     this->meshResource = DGL_Graphics_EndMesh();
-	strcpy_s(this->name, _countof(this->name), name);
+	strcpy_s(this->name, _countof(this->name), _name);
 }
 void Mesh::MeshBuildSpaceship()
 {
@@ -100,7 +100,7 @@ void Mesh::MeshBuildSpaceship()
 	this->meshResource = DGL_Graphics_EndMesh();
 
 }
-void Mesh::Render()const
+void Mesh:: MeshRender() const
 {
 	if (this->meshResource)
 	{
@@ -128,8 +128,8 @@ void Mesh::MeshRead(Stream stream)
 	   }
 		if (!strncmp(token, "Mesh", _countof("Mesh")))
 		{
-			const char* name = StreamReadToken(stream);
-			strcpy_s(this->name, _countof(this->name), name);
+			const char* _name = StreamReadToken(stream);
+			strcpy_s(this->name, _countof(this->name), _name);
 			int verticies = StreamReadInt(stream);
 			DGL_Graphics_StartMesh();
 
@@ -144,11 +144,11 @@ void Mesh::MeshRead(Stream stream)
 			this->drawMode = DGL_DM_TRIANGLELIST;
 		}
 }
-bool Mesh::MeshIsNamed(const char* name)
+bool Mesh::MeshIsNamed(const char* _name) const
 {
-	if (name)
+	if (_name)
 	{
-		if (strcmp(this->name, name) == 0)
+		if (strcmp(this->name, _name) == 0)
 		{
 			return true;
 		}

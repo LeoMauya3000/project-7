@@ -66,7 +66,8 @@ void Sprite::SpriteRead(Stream stream)
 	const char* nameToken = StreamReadToken(stream);
 	this->spriteSource = SpriteSourceLibraryBuild(nameToken);
 }
-void Sprite::Render()const
+
+void Sprite::Render() const
 {
 	Transform* transform = Parent()->Has(Transform);
 	Matrix2D matrix = *Parent()->Has(Transform)->TransformGetMatrix();
@@ -74,7 +75,7 @@ void Sprite::Render()const
 
 	if (this->spriteSource != NULL)
 	{
-		DGL_Graphics_SetShaderMode(DGL_PSM_TEXTURE, DGL_VSM_DEFAULT);	
+		DGL_Graphics_SetShaderMode(DGL_PSM_TEXTURE, DGL_VSM_DEFAULT);
 		this->spriteSource->SpriteSourceSetTexture();
 		this->spriteSource->SpriteSourceSetTextureOffset(this->frameIndex);
 
@@ -93,8 +94,8 @@ void Sprite::Render()const
 
 		matrix = *transform->TransformGetMatrix();
 		DGL_Graphics_SetCB_TransformMatrix(&matrix);
-		this->mesh->Render();
-	
+		this->mesh->MeshRender();
+
 	}
 	else
 	{
@@ -102,14 +103,14 @@ void Sprite::Render()const
 		const char* character = this->text;
 		Matrix2D offset;
 		Matrix2DIdentity(&offset);
-		Matrix2DTranslate(&offset,transform->TransformGetScale()->x, 0);
+		Matrix2DTranslate(&offset, transform->TransformGetScale()->x, 0);
 
 		while (*character != '\0')
 		{
 			characterIndex = *character - ' ';
 			this->spriteSource->SpriteSourceSetTextureOffset(characterIndex);
 			DGL_Graphics_SetCB_TransformMatrix(&matrix);
-			this->mesh->Render();
+			this->mesh->MeshRender();
 			character++;
 			Matrix2DConcat(&matrix, &offset, &matrix);
 		}
@@ -153,10 +154,18 @@ void Sprite::SpriteSetFrame(unsigned int frameIndex_)
 }
 void Sprite::SpriteSetMesh(const Mesh* _mesh)	
 {
-	if (_mesh)
+	if (!this)
 	{
-	    this->mesh = _mesh;
+		TraceMessage("SpriteSetMesh called on null this!");
+		return;
 	}
+	if (!_mesh)
+	{
+		TraceMessage("SpriteSetMesh called with null mesh!");
+		return;
+	}
+
+	this->mesh = _mesh;
 
 }
 void Sprite::SpriteSetSpriteSource(const SpriteSource* _spriteSource)
