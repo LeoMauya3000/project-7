@@ -51,11 +51,8 @@
 
 Sprite::~Sprite()
 {
-
 	delete this->spriteSource;
-	this->spriteSource = NULL;
 	delete this->mesh;
-	this->mesh = NULL;
 }
 
 
@@ -178,16 +175,12 @@ void Sprite::SpriteSetText( const char* _text)
     }
 }
 
-Sprite& Sprite::SpriteClone(const Sprite* other)
+
+
+Sprite* Sprite::Clone() const
 {
-	if (other)
-	{
-			this->alpha = other->alpha;
-			this->frameIndex = other->frameIndex;
-			this->mesh = other->mesh;
-			this->spriteSource = other->spriteSource;
-			this->text = other->text;
-			return *this;
-	}
+	return new Sprite(*this);
 }
+
+
 

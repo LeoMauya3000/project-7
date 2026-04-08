@@ -45,10 +45,10 @@ class Sprite : public Component
 {
 
 public:
-	Sprite();
+	Sprite() : alpha(1) {};
 	~Sprite() override;
 
-	Sprite& SpriteClone(const Sprite* other);
+	Sprite* Clone() const override;
 
 	void SpriteRead(Stream stream);
 

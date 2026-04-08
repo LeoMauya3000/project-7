@@ -68,19 +68,19 @@ typedef struct Level1Scene
 } Level1Scene;
  static char livesBuffer[16];
 
- static Mesh* createdMesh;
- static SpriteSource* createdSpriteSource;
- static Entity* createdEntity;
- static Sprite* createdSpirte;
+ static Mesh* createdMesh = new Mesh();
+ static SpriteSource* createdSpriteSource = new SpriteSource();
+ static Entity* createdEntity = new Entity();
+ static Sprite* createdSpirte = new Sprite();
  static const float wallDistance = 462.0f;
  static const float CheckSquareDistance = (75.0f * 75.0f);
 
  static Entity* monkeyEntity;
  static Mesh* monkeyMesh;
  static Sprite* monkeySprite;
- static SpriteSource* monkeySpriteSourceIdle;
- static SpriteSource* monkeySpriteSourceWalk;
- static SpriteSource* monkeySpriteSourceJump;
+ static SpriteSource* monkeySpriteSourceIdle = new SpriteSource();
+ static SpriteSource* monkeySpriteSourceWalk = new SpriteSource();
+ static SpriteSource* monkeySpriteSourceJump = new SpriteSource();
  
  static Entity* livesTextEntity;
  static Mesh* textMesh;
@@ -154,27 +154,14 @@ static void Level1SceneLoad(void)
 		StreamClose(&streamFile);
 	}
 
-	createdMesh = MeshCreate();
-	MeshBuildQuad(createdMesh, 0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
-	createdSpriteSource = SpriteSourceCreate();
-	SpriteSourceLoadTexture(createdSpriteSource, 1, 1, "PlanetTexture.png");
-	
-	
-	monkeyMesh = MeshCreate();
-	MeshBuildQuad(monkeyMesh, 0.5, 0.5, 1.0f / 3, 1.0f / 3, "Mesh3x3");
-	monkeySpriteSourceIdle = SpriteSourceCreate();
-	SpriteSourceLoadTexture(monkeySpriteSourceIdle, 1, 1, "MonkeyIdle.png");
-	monkeySpriteSourceWalk = SpriteSourceCreate();
-	SpriteSourceLoadTexture(monkeySpriteSourceWalk, 3, 3, "MonkeyWalk.png");
-	monkeySpriteSourceJump = SpriteSourceCreate();
-	SpriteSourceLoadTexture(monkeySpriteSourceJump, 1, 1, "MonkeyJump.png");
-
-	
-
-	textMesh = MeshCreate();
-	MeshBuildQuad(textMesh, 0.5f, 0.5f, 1.0f/16, 1.0f/8, "Mesh16x8");
-	textSpriteSource = SpriteSourceCreate();
-	SpriteSourceLoadTexture(textSpriteSource, 16, 8, "Roboto_Mono_black.png");
+	createdMesh->MeshBuildQuad(0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
+	createdSpriteSource->SpriteSourceLoadTexture( 1, 1, "PlanetTexture.png");
+	monkeyMesh->MeshBuildQuad(0.5, 0.5, 1.0f / 3, 1.0f / 3, "Mesh3x3");
+	monkeySpriteSourceIdle->SpriteSourceLoadTexture( 1, 1, "MonkeyIdle.png");
+	monkeySpriteSourceWalk->SpriteSourceLoadTexture( 3, 3, "MonkeyWalk.png");
+	monkeySpriteSourceJump->SpriteSourceLoadTexture(1, 1, "MonkeyJump.png");
+	textMesh->MeshBuildQuad( 0.5f, 0.5f, 1.0f/16, 1.0f/8, "Mesh16x8");
+	textSpriteSource->SpriteSourceLoadTexture(16, 8, "Roboto_Mono_black.png");
 
 
 	
@@ -192,9 +179,9 @@ static void Level1SceneInit(void)
 	monkeyEntity = EntityFactoryBuild("Monkey");
 	if (createdEntity)
 	{	
-		SpriteSetMesh(EntityGetSprite(createdEntity), createdMesh);
-		SpriteSetSpriteSource(EntityGetSprite(createdEntity), createdSpriteSource);
-		SpriteSetFrame(EntityGetSprite(createdEntity), 0);
+		createdEntity->Has(Sprite)->SpriteSetMesh(createdMesh);
+		createdEntity->Has(Sprite)->SpriteSetSpriteSource(createdSpriteSource);
+		createdEntity->Has(Sprite)->SpriteSetFrame(0);
 	}
 	if (monkeyEntity)
 	{
@@ -203,7 +190,7 @@ static void Level1SceneInit(void)
 	}
 	if (livesTextEntity)
 	{
-	   textSprite = EntityGetSprite(livesTextEntity);
+	   textSprite = livesTextEntity->Has(Sprite);
 	   SpriteSetMesh(textSprite, textMesh);
 	   SpriteSetSpriteSource(textSprite, textSpriteSource);
 	   sprintf_s(livesBuffer,sizeof(livesBuffer),"Lives: %d",instance.numLives);
@@ -223,10 +210,9 @@ static void Level1SceneUpdate(float dt)
 
 	Level1SceneMovementController(monkeyEntity);
 	Level1SceneBounceController(createdEntity);
-	EntityUpdate(createdEntity, dt);
-	EntityUpdate(monkeyEntity, dt);
-	EntityUpdate(livesTextEntity, dt);
-
+	createdEntity->EntityUpdate(dt);
+	monkeyEntity->EntityUpdate(dt);
+	livesTextEntity->EntityUpdate(dt);
 
 	if (Level1SceneIsColliding(monkeyEntity, createdEntity))
 	{
@@ -244,73 +230,46 @@ static void Level1SceneUpdate(float dt)
 		}
 
 	}
-	/*
-	if (DGL_Input_KeyTriggered('1'))
-	{
-
-		TransformSetTranslation(EntityGetTransform(createdEntity), &resetTranslation);
-		PhysicsSetVelocity(EntityGetPhysics(createdEntity), &resetacelleration);
-		PhysicsSetAcceleration(EntityGetPhysics(createdEntity), &resetacelleration);
-		SceneSystemSetNext(Level1SceneGetInstance());
-		
-	}
-	if (DGL_Input_KeyTriggered('2'))
-	{
-		SceneSystemSetNext(level2SceneGetInstance());
-	}
-
-	if (DGL_Input_KeyTriggered('9'))
-	{
-		SceneSystemSetNext(SandBoxSceneGetInstance());
-	}
-
-	if (DGL_Input_KeyTriggered('0'))
-	{
-		SceneSystemSetNext(DemoSceneGetInstance());
-	}
-	*/
 }
 
 // Render any objects associated with the scene.
 void Level1SceneRender(void)
 {
-	EntityRender(createdEntity);
-	EntityRender(monkeyEntity);
-	EntityRender(livesTextEntity);
-
+	createdEntity->EntityRender();
+	monkeyEntity->EntityRender();
+	livesTextEntity->EntityRender();
 }
 
 // Free any objects associated with the scene.
 static void Level1SceneExit(void)
 {
 	
-	EntityFree(&createdEntity);
-	EntityFree(&monkeyEntity);
-	EntityFree(&livesTextEntity);
-	
-
+	delete createdEntity;
+	delete monkeyEntity;
+	delete livesTextEntity;
 }
 
 // Unload any resources used by the scene.
 static void Level1SceneUnload(void)
 {
-	SpriteSourceFree(&monkeySpriteSourceIdle);
-	SpriteSourceFree(&monkeySpriteSourceJump);
-	SpriteSourceFree(&monkeySpriteSourceWalk);
-	SpriteSourceFree(&createdSpriteSource);
-	SpriteSourceFree(&textSpriteSource);
-	MeshFree(&createdMesh);
-	MeshFree(&monkeyMesh);
-	MeshFree(&textMesh);
+	delete monkeySpriteSourceIdle;
+	delete monkeySpriteSourceJump;
+	delete monkeySpriteSourceWalk;
+	delete createdSpriteSource;
+	delete textSpriteSource;
+	delete createdMesh;
+	delete monkeyMesh;
+	delete textMesh;
+
 
 }
 
 static void Level1SceneMovementController(Entity *entity)
 {
-	 const Physics *physics = (EntityGetPhysics(entity));
-	 const Transform * transform = (EntityGetTransform(entity));
+	const Physics* physics = entity->Has(Physics);
+	const Transform* transform = entity->Has(Transform);
 
-	if (EntityGetPhysics(entity) && EntityGetTransform(entity))
+	if (physics && transform)
 	{
 		Vector2D velocity = *(PhysicsGetVelocity(physics));
 		Vector2D translation = *(TransformGetTranslation(transform));

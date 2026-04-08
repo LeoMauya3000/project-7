@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 #pragma once
-
+#include <vector>
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 // Forward References:
 //------------------------------------------------------------------------------
 
-
+class Entity;
 class EntityContainer
 {
 public:
@@ -29,11 +29,9 @@ public:
 	~EntityContainer();
 
 	bool EntityContainerAddEntity( Entity* entity);
-	void EntityContainerFreeEntity(Entity* entity);
-
 	Entity* EntityContainerFindByName(const char* entityName);
 
-	bool EntityContainerIsEmpty();
+	bool EntityContainerIsEmpty() const;
 
 	void EntityContainerUpdateAll(float dt);
 

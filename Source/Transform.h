@@ -11,6 +11,8 @@
 
 #pragma once
 #include "Component.h"
+#include "DGL.h"
+#include "Matrix2D.h"
 
 //------------------------------------------------------------------------------
 // Include Files:
@@ -44,7 +46,7 @@ class  Transform : public Component
 		Transform();
 		~Transform()override{};
 	      
-		Transform& TransformClone(const Transform* other);
+		Transform* Clone() const override;
 
 		void TransformRead(Stream stream);
 

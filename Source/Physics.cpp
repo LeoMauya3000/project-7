@@ -16,176 +16,74 @@
 #include "Vector2D.h"
 #include "Transform.h"
 
-
-//------------------------------------------------------------------------------
-// Private Constants:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Structures:
-//------------------------------------------------------------------------------
-typedef struct Physics
+Physics* Physics::Clone() const
 {
-	// Previous position.  May be used for resolving collisions.
-	Vector2D	oldTranslation;
-
-	// Acceleration = inverseMass * (sum of forces)
-	Vector2D	acceleration;
-
-	// Velocity may be stored as a direction vector and speed scalar, instead.
-	Vector2D	velocity;
-
-	// Rotational velocity (in radians).
-	float rotationalVelocity;
-
-	// Used when calculating acceleration due to forces.
-	// Used when resolving collision between two dynamic objects.
-	//float		inverseMass;
-
-} Physics;
-
-
-//------------------------------------------------------------------------------
-// Public Variables:
-//------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-// Private Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Function Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Functions:
-//------------------------------------------------------------------------------
-
-
-Physics* PhysicsCreate(void)
-{
-	Physics* physics = calloc(1, sizeof(Physics));
-	if (physics)
-	{
-		return physics;
-	}
-	else
-	{
-		return NULL;
-	}
-	
-	
+	return new Physics(*this);
 }
-void PhysicsFree(Physics** physics)
-{
-	free(*physics);
-	*physics = NULL;
-}
-void PhysicsRead(Physics* physics, Stream stream)
+
+void Physics::PhysicsRead(Stream stream)
 {
 
 	if (stream)
 	{
-		StreamReadVector2D(stream, &physics->acceleration);
-		StreamReadVector2D(stream, &physics->velocity);
+		StreamReadVector2D(stream, &this->acceleration);
+		StreamReadVector2D(stream, &this->velocity);
 	}
-	
-
 } 
-const Vector2D* PhysicsGetAcceleration(const Physics* physics)
+const Vector2D* Physics::PhysicsGetAcceleration() const
 {
-
-	if (physics)
-	{
-		return &physics->acceleration;
-	}
-	else
-	{
-		return NULL;
-	}
+	return &this->acceleration;
+}
+const Vector2D* Physics::PhysicsGetVelocity()const
+{
+	return &this->velocity;
+}
+const Vector2D* Physics::PhysicsGetOldTranslation() const
+{
+	return &this->oldTranslation;
 	
 }
-const Vector2D* PhysicsGetVelocity(const Physics* physics)
+void Physics::PhysicsSetAcceleration(const Vector2D* acceleration)
 {
-	if (physics)
-	{
-		return &physics->velocity;
-	}
-	else
-	{
-		return NULL;
-	}
-
+	this->acceleration = *acceleration;
 }
-const Vector2D* PhysicsGetOldTranslation(const Physics* physics)
+void Physics::PhysicsSetVelocity( const Vector2D* velocity)
 {
-	if (physics)
-	{
-		return &physics->oldTranslation;
-	}
-	else
-	{
-		return NULL;
-	}
-	
+	this->velocity = *velocity; 
 }
-void PhysicsSetAcceleration(Physics* physics, const Vector2D* acceleration)
-{
-	physics->acceleration = *acceleration;
-	
-}
-void PhysicsSetVelocity(Physics* physics, const Vector2D* velocity)
-{
-	physics->velocity = *velocity; 
-}
-void PhysicsUpdate(Physics* physics, Transform* transform, float dt)
+void Physics::Update(float dt)
 {
 
-	if (physics != NULL && transform != NULL)
+	if (this->Parent()->Has(Transform))
 	{
 
-	    float rotationVelocity = PhysicsGetRotationalVelocity(physics);
-		float transformRotaion = TransformGetRotation(transform);
-		const Vector2D* translationPtr = TransformGetTranslation(transform);
+	    float rotationVelocity = this->Parent()->Has(Physics)->PhysicsGetRotationalVelocity();
+		float transformRotaion = this->Parent()->Has(Transform)->TransformGetRotation();
+		const Vector2D* translationPtr = this->Parent()->Has(Transform)->TransformGetTranslation();
 		Vector2D translation = *translationPtr;
-		physics->oldTranslation = *translationPtr;
-		Vector2DScaleAdd(&physics->velocity, &physics->acceleration, dt, &physics->velocity);
-		Vector2DScaleAdd(&translation, &physics->velocity, dt, &translation);
-		TransformSetTranslation(transform, &translation);
+		this->oldTranslation = *translationPtr;
+		Vector2DScaleAdd(&this->velocity, &this->acceleration, dt, &this->velocity);
+		Vector2DScaleAdd(&translation, &this->velocity, dt, &translation);
+		this->Parent()->Has(Transform)->TransformSetTranslation(&translation);
 		transformRotaion += rotationVelocity * dt;	
-		TransformSetRotation(transform, transformRotaion);
-		
-
-
+		this->Parent()->Has(Transform)->TransformSetRotation(transformRotaion);
 	}
 }
-Physics* PhysicsClone(const Physics* other)
+Physics* Physics::Clone()const
 {
-	if (other)
-	{
-		Physics* clonePhyscics = calloc(1, sizeof(Physics));
-		if (clonePhyscics)
-		{
-			*clonePhyscics = *other;
-			return clonePhyscics;
-		}
-	}
-	return NULL;
+	return new Physics(*this);
 }
 
-float PhysicsGetRotationalVelocity(const Physics* physics)
+float Physics::PhysicsGetRotationalVelocity() const
 {
-	if (physics)
-	{
-		return physics->rotationalVelocity;
-	}
-	return 0;
+	this->rotationalVelocity;
 }
-void PhysicsSetRotationalVelocity(Physics* physics, float rotationalVelocity)
+void Physics::PhysicsSetRotationalVelocity(float rotationalVelocity)
 {
-	if (physics)
-	{
-		physics->rotationalVelocity = rotationalVelocity;
-	}
+		this->rotationalVelocity = rotationalVelocity;
+}
+
+void Physics::PhysicsSetDrag(float drag)
+{
+	this->drag = drag;
 }

@@ -134,13 +134,9 @@ const Matrix2D* Transform::TransformGetMatrix()
 }
 
 
-Transform& Transform::TransformClone(const Transform* other)
+Transform* Transform::Clone() const
 {
-	this->isDirty = other->isDirty;
-	this->matrix = other->matrix;
-	this->rotation = other->rotation;
-	this->scale = other->scale;
-	this->translation = other->translation;
+	return new Transform(*this);
 }
 
 

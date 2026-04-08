@@ -107,7 +107,7 @@ Entity* EntityContainer::EntityContainerFindByName( const char* entityName)
 	}
 	return NULL;
 }
-bool EntityContainer::EntityContainerIsEmpty()
+bool EntityContainer::EntityContainerIsEmpty() const
 {
 	if (this->entityCount == 0)
 	{
@@ -173,7 +173,7 @@ void EntityContainer::EntityContainerCheckCollisions()
 		Entity* entityB = NULL;
 		
 
-		for (int i = 0; i < this->entityCount; ++i)
+		for (unsigned int i = 0; i < this->entityCount; ++i)
 		{
 				if (this->entities[i] && this->entities[i]->Has(Collider))
 				{

@@ -40,7 +40,10 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
-
+SpriteSource::~SpriteSource()
+{
+	DGL_Graphics_FreeTexture(&(this->texture));
+}
 
 void SpriteSource::SpriteSourceLoadTexture(int numCols, int numRows, const char* textureName)
 {

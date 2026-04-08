@@ -35,6 +35,14 @@ class SpriteSource
 {
     public:
 
+		SpriteSource() : numCols(1), numRows(1)
+		{
+			name[0] = '\0';
+			texture = NULL;
+		};
+
+		~SpriteSource();
+
 	void SpriteSourceLoadTexture(int numCols, int numRows, const char* textureName);
 
 	void SpriteSourceRead(Stream stream);
@@ -55,7 +63,7 @@ class SpriteSource
 	char name[32];
 	int	numRows;
 	int	numCols;
-	const DGL_Texture* texture;
+	 DGL_Texture* texture;
 
 };
 
