@@ -39,17 +39,17 @@ class SpriteSource
 
 	void SpriteSourceRead(Stream stream);
 
-	bool SpriteSourceIsNamed(const char* name);
+	bool SpriteSourceIsNamed(const char* name) const;
 
-	unsigned SpriteSourceGetFrameCount();
+	unsigned SpriteSourceGetFrameCount() const;
 
-	void SpriteSourceGetUV(unsigned int frameIndex, float* u, float* v);
-
-
-	void SpriteSourceSetTexture();
+	void SpriteSourceGetUV(unsigned int frameIndex, float* u, float* v) const;
 
 
-	void SpriteSourceSetTextureOffset(unsigned frameIndex);
+	void SpriteSourceSetTexture() const;
+
+
+	void SpriteSourceSetTextureOffset(unsigned frameIndex) const;
 
     private:
 	char name[32];

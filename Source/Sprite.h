@@ -36,6 +36,10 @@
 
 // An example of the structure to be defined in Sprite.c.
 
+class Entity;
+class SpriteSource;
+class Mesh;
+
 
 class Sprite : public Component
 {
@@ -44,21 +48,19 @@ public:
 	Sprite();
 	~Sprite() override;
 
-	Sprite* SpriteClone(const Sprite* other);
+	Sprite& SpriteClone(const Sprite* other);
 
 	void SpriteRead(Stream stream);
 
-	void Render() const override {};
-
 	float SpriteGetAlpha();
 
-	void SpriteSetAlpha(float alpha);
+	void SpriteSetAlpha(float _alpha);
 
-	void SpriteSetFrame(unsigned int frameIndex);
+	void SpriteSetFrame(unsigned int _frameIndex);
 
-	void SpriteSetMesh(const Mesh* mesh);
+	void SpriteSetMesh(const Mesh* _mesh);
 
-	void SpriteSetSpriteSource(SpriteSource* spriteSource);
+	void SpriteSetSpriteSource(const SpriteSource* _spriteSource);
 
 	void SpriteSetText(const char* text);
 	void Render() const override{};

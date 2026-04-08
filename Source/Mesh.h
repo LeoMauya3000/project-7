@@ -11,7 +11,7 @@
 
 #pragma once
 #include "DGL.h"
-
+#include "Component.h"
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
@@ -45,8 +45,6 @@ class  Mesh : public Component
 	{
 		name[0] = '\0';
 	}
-
-
 
 	void MeshBuildQuad(float xHalfSize, float yHalfSize, float uSize, float vSize, const char* name);
 

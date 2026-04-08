@@ -21,6 +21,7 @@
 #include "MeshLibrary.h"
 #include <math.h>
 #include "SpriteSourceLibrary.h"
+#include "Entity.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -58,9 +59,6 @@ Sprite::~Sprite()
 }
 
 
-
-
-
 void Sprite::SpriteRead(Stream stream)
 {
 	//removed sprite and mesh variables and passed
@@ -71,16 +69,17 @@ void Sprite::SpriteRead(Stream stream)
 	const char* nameToken = StreamReadToken(stream);
 	this->spriteSource = SpriteSourceLibraryBuild(nameToken);
 }
-void Sprite::Render(Transform* transform)const
+void Sprite::Render()const
 {
-	 Matrix2D matrix = *TransformGetMatrix(transform);
+	Transform* transform = Parent()->Has(Transform);
+	Matrix2D matrix = *Parent()->Has(Transform)->TransformGetMatrix();
 
 
-	if (sprite->spriteSource != NULL)
+	if (this->spriteSource != NULL)
 	{
 		DGL_Graphics_SetShaderMode(DGL_PSM_TEXTURE, DGL_VSM_DEFAULT);	
-		SpriteSourceSetTexture(sprite->spriteSource);
-		SpriteSourceSetTextureOffset(sprite->spriteSource, sprite->frameIndex);	
+		this->spriteSource->SpriteSourceSetTexture();
+		this->spriteSource->SpriteSourceSetTextureOffset(this->frameIndex);
 
 	}
 	else
@@ -89,41 +88,42 @@ void Sprite::Render(Transform* transform)const
 	}
 
 	DGL_Graphics_SetCB_TransformMatrix(&matrix);
-	DGL_Graphics_SetCB_Alpha(sprite->alpha);
-	DGL_Graphics_SetCB_TintColor(&(DGL_Color) { 0.0f, 0.0f, 0.0f, 0.0f });
-	if (sprite->text == NULL)
+	DGL_Graphics_SetCB_Alpha(this->alpha);
+	DGL_Color color = { 0.0f, 0.0f, 0.0f, 0.0f };
+	DGL_Graphics_SetCB_TintColor(&color);
+	if (this->text == NULL)
 	{
 
-		matrix = *TransformGetMatrix(transform);
+		matrix = *transform->TransformGetMatrix();
 		DGL_Graphics_SetCB_TransformMatrix(&matrix);
-		MeshRender(sprite->mesh);
+		this->mesh->Render();
+	
 	}
 	else
 	{
 		int characterIndex = 0;
-		const char* character = sprite->text;
+		const char* character = this->text;
 		Matrix2D offset;
 		Matrix2DIdentity(&offset);
-		Matrix2DTranslate(&offset,TransformGetScale(transform)->x, 0);
+		Matrix2DTranslate(&offset,transform->TransformGetScale()->x, 0);
 
 		while (*character != '\0')
 		{
 			characterIndex = *character - ' ';
-			SpriteSourceSetTextureOffset(sprite->spriteSource, characterIndex);
+			this->spriteSource->SpriteSourceSetTextureOffset(characterIndex);
 			DGL_Graphics_SetCB_TransformMatrix(&matrix);
-			MeshRender(sprite->mesh);
+			this->mesh->Render();
 			character++;
 			Matrix2DConcat(&matrix, &offset, &matrix);
-	
 		}
 	}
 }
-float SpriteGetAlpha(const Sprite* sprite)
+float Sprite::SpriteGetAlpha()
 {
 
-	if (sprite)
+	if (this)
 	{
-		return sprite->alpha;
+		return this->alpha;
 	}
 	else
 	{
@@ -131,74 +131,63 @@ float SpriteGetAlpha(const Sprite* sprite)
 	}
 	
 }
-void SpriteSetAlpha(Sprite* sprite, float alpha)
+void Sprite::SpriteSetAlpha( float _alpha)
 {
-	if (alpha > 1)
+	if (_alpha > 1)
 	{
-		alpha = 1;
+		_alpha = 1;
 	}
-	if (alpha < 0)
+	if (_alpha < 0)
 	{
-		alpha = 0;
+		_alpha = 0;
 	}
-	sprite->alpha = alpha;
+	this->alpha = alpha;
 }
-void SpriteSetFrame(Sprite* sprite, unsigned int frameIndex)
+void Sprite::SpriteSetFrame(unsigned int frameIndex_)
 {
-	//unsigned int maxFrameCount = SpriteSourceGetFrameCount(sprite->spriteSource);
-
-
-	if (sprite)
+	if (this)
 	{
-		if (frameIndex <= SpriteSourceGetFrameCount(sprite->spriteSource) && frameIndex >= 0)
+		if (frameIndex_ <= this->spriteSource->SpriteSourceGetFrameCount() && frameIndex_ >= 0)
 		{
-
-
-			sprite->frameIndex = frameIndex;
+			this->frameIndex = frameIndex_;
 		}
 	}
 	TraceMessage("SpriteSetFrame: frame index = %d", frameIndex);
 }
-void SpriteSetMesh(Sprite* sprite, const Mesh* mesh)	
+void Sprite::SpriteSetMesh(const Mesh* _mesh)	
 {
-	if (sprite && mesh)
+	if (_mesh)
 	{
-	 sprite->mesh = mesh;
-
+	    this->mesh = _mesh;
 	}
 
 }
-void SpriteSetSpriteSource(Sprite* sprite, const SpriteSource* spriteSource)
+void Sprite::SpriteSetSpriteSource(const SpriteSource* _spriteSource)
 {
-	if (sprite && spriteSource)
+	if (_spriteSource)
 	{
-		sprite->spriteSource = spriteSource;
+		this->spriteSource = _spriteSource;
 	}
 	
 }
-void SpriteSetText(Sprite* sprite, const char* text)
+void Sprite::SpriteSetText( const char* _text)
 {
-	if (sprite)
+	if (this)
 	{
-		sprite->text = text;
-     }
+		this->text = _text;
+    }
 }
 
-Sprite* SpriteClone(const Sprite* other)
+Sprite& Sprite::SpriteClone(const Sprite* other)
 {
 	if (other)
 	{
-		Sprite *clonedSprite = calloc(1, sizeof(Sprite));
-		if (clonedSprite)
-		{
-			clonedSprite->alpha = other->alpha;
-			clonedSprite->frameIndex = other->frameIndex;
-			clonedSprite->mesh = other->mesh;
-			clonedSprite->spriteSource = other->spriteSource;
-			clonedSprite->text = other->text;
-			return clonedSprite;
-		}
+			this->alpha = other->alpha;
+			this->frameIndex = other->frameIndex;
+			this->mesh = other->mesh;
+			this->spriteSource = other->spriteSource;
+			this->text = other->text;
+			return *this;
 	}
-	return NULL;
 }
 

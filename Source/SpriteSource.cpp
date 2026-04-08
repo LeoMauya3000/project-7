@@ -51,7 +51,7 @@ void SpriteSource::SpriteSourceLoadTexture(int numCols, int numRows, const char*
 	this->numCols = numCols;
 
 }
-unsigned SpriteSource::SpriteSourceGetFrameCount()
+unsigned SpriteSource::SpriteSourceGetFrameCount() const
 {
 	if (this)
 	{
@@ -62,7 +62,7 @@ unsigned SpriteSource::SpriteSourceGetFrameCount()
 		return 0;
 	}
 } 
-void SpriteSource::SpriteSourceGetUV(unsigned int frameIndex, float* u, float* v)
+void SpriteSource::SpriteSourceGetUV(unsigned int frameIndex, float* u, float* v) const
 {
 
 	float col = 1.0f / this->numCols;
@@ -73,14 +73,14 @@ void SpriteSource::SpriteSourceGetUV(unsigned int frameIndex, float* u, float* v
 
 }
 	
-void  SpriteSource::SpriteSourceSetTexture()
+void  SpriteSource::SpriteSourceSetTexture() const
 {  
 	DGL_Graphics_SetTexture(this->texture);
 }
-void SpriteSource::SpriteSourceSetTextureOffset( unsigned frameIndex)
+void SpriteSource::SpriteSourceSetTextureOffset( unsigned frameIndex) const
 {
 	DGL_Vec2 uv = { 0,0 };
-	SpriteSourceGetUV(frameIndex, &uv.x, &uv.y);
+	this->SpriteSourceGetUV(frameIndex, &uv.x, &uv.y);
 	DGL_Graphics_SetCB_TextureOffset(&uv);
 }
 void SpriteSource::SpriteSourceRead(Stream stream)
@@ -105,7 +105,7 @@ void SpriteSource::SpriteSourceRead(Stream stream)
 		}
 	}
 }
-bool  SpriteSource::SpriteSourceIsNamed(const char* name)
+bool  SpriteSource::SpriteSourceIsNamed(const char* name)const
 {
 	if (name)
 	{
