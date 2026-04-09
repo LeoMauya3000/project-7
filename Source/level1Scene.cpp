@@ -68,7 +68,8 @@ typedef struct Level1Scene
 } Level1Scene;
  static char livesBuffer[16];
 
- static Mesh* createdMesh = new Mesh();
+ static Mesh* createdMesh;
+ static Mesh* monkeyMesh1x1 = new Mesh();
  static SpriteSource* createdSpriteSource = new SpriteSource();
  static Entity* createdEntity = new Entity();
  static Sprite* createdSpirte = new Sprite();
@@ -154,6 +155,16 @@ static void Level1SceneLoad(void)
 		StreamClose(&streamFile);
 	}
 
+	createdMesh = new Mesh();
+	monkeyMesh1x1 = new Mesh();
+	createdSpriteSource = new SpriteSource();
+	monkeyMesh = new Mesh();
+	monkeySpriteSourceIdle = new SpriteSource();
+	monkeySpriteSourceWalk = new SpriteSource();
+	monkeySpriteSourceJump = new SpriteSource();
+	textMesh = new Mesh();
+	textSpriteSource = new SpriteSource();
+	monkeyMesh1x1->MeshBuildQuad(0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
 	createdMesh->MeshBuildQuad(0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
 	createdSpriteSource->SpriteSourceLoadTexture( 1, 1, "PlanetTexture.png");
 	monkeyMesh->MeshBuildQuad(0.5, 0.5, 1.0f / 3, 1.0f / 3, "Mesh3x3");
@@ -244,24 +255,32 @@ void Level1SceneRender(void)
 static void Level1SceneExit(void)
 {
 	
-	delete createdEntity;
-	delete monkeyEntity;
-	delete livesTextEntity;
+	createdEntity = nullptr;
+	monkeyEntity = nullptr;
+	livesTextEntity = nullptr;
 }
 
 // Unload any resources used by the scene.
 static void Level1SceneUnload(void)
 {
 	delete monkeySpriteSourceIdle;
+	monkeySpriteSourceIdle = nullptr;
 	delete monkeySpriteSourceJump;
+	monkeySpriteSourceJump = nullptr;
 	delete monkeySpriteSourceWalk;
+	monkeySpriteSourceWalk = nullptr;
 	delete createdSpriteSource;
+	createdSpriteSource = nullptr;
 	delete textSpriteSource;
+	textSpriteSource = nullptr;
 	delete createdMesh;
+	createdMesh = nullptr;
 	delete monkeyMesh;
+	monkeyMesh = nullptr;
 	delete textMesh;
-
-
+	textMesh = nullptr;
+	delete monkeyMesh1x1;
+	monkeyMesh1x1 = nullptr;
 }
 
 static void Level1SceneMovementController(Entity *entity)
@@ -325,14 +344,14 @@ static void Level1SceneSetMonkeyState(Entity* entity, Monkeystates newState)
 	Sprite* monkeySpriteLocal = entity->Has(Sprite);
 	Animation* monkeyAnimationComponent = entity->Has(Animation);
 
-
+	
 	if (monkeyState != (Monkeystates)newState)
 	{
 		monkeyState = newState;
 		switch (newState)
 		{
 		    case MonkeyIdle:
-				monkeySpriteLocal->SpriteSetMesh(createdMesh);
+				monkeySpriteLocal->SpriteSetMesh(monkeyMesh1x1);
 				monkeySpriteLocal->SpriteSetSpriteSource(monkeySpriteSourceIdle);
 				monkeyAnimationComponent->AnimationPlay(1, 0.0f, false);
 			break;
@@ -342,7 +361,7 @@ static void Level1SceneSetMonkeyState(Entity* entity, Monkeystates newState)
 				monkeyAnimationComponent->AnimationPlay(8, 0.05f, true);
 			break;
 		    case MonkeyJump:
-				monkeySpriteLocal->SpriteSetMesh(createdMesh);
+				monkeySpriteLocal->SpriteSetMesh(monkeyMesh1x1);
 				monkeySpriteLocal->SpriteSetSpriteSource(monkeySpriteSourceJump);
 				monkeyAnimationComponent->AnimationPlay(1, 0.0f, false);
 			break;

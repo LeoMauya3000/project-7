@@ -109,7 +109,8 @@ const Scene* level2SceneGetInstance(void)
 static void level2SceneLoad(void)
 {
 
-
+	    
+	instance.createdMesh = new Mesh();
 	instance.createdMesh->MeshBuildSpaceship();
 
 
@@ -162,13 +163,14 @@ void level2SceneRender(void)
 // Free any objects associated with the scene.
 static void level2SceneExit()
 {
-	delete instance.createdEntity;
+	instance.createdEntity = nullptr;
 }
 
 // Unload any resources used by the scene.
 static void level2SceneUnload(void)
 {
-	// pretty sure this a double free
+	delete instance.createdMesh;
+	instance.createdMesh = nullptr;
 }
 
 static void Level2SceneMovementController(Entity* entity)

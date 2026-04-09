@@ -16,7 +16,7 @@
 #include "Transform.h"
 #include "Collider.h"
 //#include "Collider.h"
-#define MAXENTITYENTRY 100
+
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
@@ -74,12 +74,8 @@ bool EntityContainer::EntityContainerAddEntity(Entity* entity)
 		 if (this->entityCount < this->entityMax)
 		 {
 			 this->entities.push_back(entity);
-
-			 if (this->entities[this->entityCount])
-			 {
-				 this->entityCount++;
-				 return true;
-			 }
+			 this->entityCount++;
+			 return true;
 		 }
 	 }
 	 return false;
@@ -91,9 +87,12 @@ Entity* EntityContainer::EntityContainerFindByName( const char* entityName)
 	{
 		for (auto entity : entities)
 		{
-			if (entity->EntityIsNamed(entityName))
+			if (entity)
 			{
-				return entity;
+				if (entity->EntityIsNamed(entityName))
+				{
+					return entity;
+				}
 			}
 		}
 	}
@@ -109,25 +108,27 @@ bool EntityContainer::EntityContainerIsEmpty() const
 }
 void EntityContainer::EntityContainerUpdateAll( float dt)
 {
-		for (unsigned i = 0; i < this->entityCount; i++)
+	if (this)
+	{
+		for (auto entity = entities.begin(); entity != entities.end();)
 		{
-			if (this->entities[i])
+			if (*entity)
 			{
-				this->entities[i]->EntityUpdate(dt);
+				(*entity)->EntityUpdate(dt);
 
-			}
-			if (this->entities[i]->EntityIsDestroyed())
-			{
-		
-				delete this->entities[i];
-				for (unsigned int j = i; j < this->entityCount - 1; j++)
+				if ((*entity)->EntityIsDestroyed())
 				{
-					this->entities[j] = this->entities[j + 1];
+
+					delete* entity;
+					entity = entities.erase(entity);
+					--entityCount;
+					continue;
 				}
-				this->entityCount--;
-				i--;
 			}
+			  ++entity;
+			
 		}
+	}
 }
 void EntityContainer::EntityContainerRenderAll()
 {
@@ -135,7 +136,10 @@ void EntityContainer::EntityContainerRenderAll()
 	{
 		for (auto entity : entities)
 		{
-			entity->EntityRender();
+			if (entity)
+			{
+				entity->EntityRender();
+			}
 		}
 	}
 }
@@ -145,10 +149,10 @@ void EntityContainer::EntityContainerFreeAll()
 	{
 		for (auto entity : entities)
 		{
-			if (entity) 
-			{
+			
+			
 				delete entity;
-			}
+			
 		}
 		this->entities.clear();
 		this->entityCount = 0;

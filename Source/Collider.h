@@ -41,7 +41,7 @@ class Collider : public Component
 		DEFAULT
 
 	};
-	   Collider() :colliderType(DEFAULT),handler(NULL),memorySize(0){};
+	   Collider() : Component(Component::cCollider),colliderType(DEFAULT),handler(NULL),memorySize(0){};
 	   ~Collider() {};
 	   Collider(ColliderType type_) : colliderType(type_), handler(NULL), memorySize(0){}
 	   Collider* Clone() const override;

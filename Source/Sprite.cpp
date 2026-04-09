@@ -49,11 +49,8 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
-Sprite::~Sprite()
-{
-	delete this->spriteSource;
-	delete this->mesh;
-}
+
+
 
 
 void Sprite::SpriteRead(Stream stream)

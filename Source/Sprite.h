@@ -45,8 +45,8 @@ class Sprite : public Component
 {
 
 public:
-	Sprite() : alpha(1), mesh(NULL), spriteSource(NULL), frameIndex(0), text(NULL){};
-	~Sprite() override;
+	Sprite() : Component(Component::cSprite), alpha(1), mesh(NULL), spriteSource(NULL), frameIndex(0), text(NULL){};
+	~Sprite() override {};
 
 	Sprite* Clone() const override;
 

@@ -17,8 +17,9 @@
 #include "Vector2D.h"
 #include "Matrix2D.h"
 
-Transform::Transform()
+Transform::Transform() : Component(Component::cTransform)
 {
+
 	Vector2DSet(&this->scale, 1.0f, 1.0f);
 	Vector2DSet(&this->translation, 0.0f, 0.0f);
 	Matrix2DIdentity(&this->matrix);

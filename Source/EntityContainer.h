@@ -13,6 +13,7 @@
 #include <vector>
 #include "Component.h"
 #include "Collider.h"
+#define MAXENTITYENTRY 100
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
@@ -27,10 +28,7 @@ class EntityContainer
 {
 public:
 
-	EntityContainer() : entityCount(0), entityMax(0)
-	{
-		entities.resize(entityMax, nullptr);
-	};
+	EntityContainer() : entityCount(0), entityMax(MAXENTITYENTRY) {};
 	~EntityContainer();
 
 	bool EntityContainerAddEntity( Entity* entity);

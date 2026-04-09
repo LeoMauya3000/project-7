@@ -72,7 +72,7 @@ void Animation::AnimationPlay( int _frameCount, float _frameDuration, bool _isLo
 		this->frameIndex = 0;
 		this->frameDelay = this->frameDuration;
 		this->isDone = false;
-		Sprite* entitySprite = Parent()->GetComponent<Sprite>(Component::cTransform);
+		Sprite* entitySprite = Parent()->GetComponent<Sprite>(Component::cSprite);
 		entitySprite->SpriteSetFrame(this->frameIndex);
 }
 

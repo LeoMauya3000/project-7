@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 #include "component.h"
+
 #define Has(type) GetComponent<type>(Component::c##type)
 
 

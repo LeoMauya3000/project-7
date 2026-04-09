@@ -45,7 +45,7 @@ class  Physics : public Component
 {
   public:
 
-	  Physics() :oldTranslation({ 0,0 }), acceleration({ 0,0 }), velocity({0,0}), rotationalVelocity(0),drag(0){};
+	  Physics() :oldTranslation({ 0,0 }), acceleration({ 0,0 }), velocity({0,0}), rotationalVelocity(0),drag(0), Component(Component::cPhysics){};
 	  ~Physics() {};
 
 	  Physics* Clone() const override;

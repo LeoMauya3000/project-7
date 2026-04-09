@@ -154,6 +154,7 @@ void SceneUnload(const Scene* scene)
 		// Execute the Unload function.
 		(*scene->unload)();
 		delete entities;
+		entities = nullptr;
 		MeshLibraryFreeAll();
 		SpriteSourceLibraryFreeAll();
 	}

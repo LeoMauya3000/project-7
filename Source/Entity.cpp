@@ -147,7 +147,7 @@ void Entity::EntitySetName(const char* _name)
 {
 	if (_name)
 	{
-		strcpy_s(this->name, name);
+		strcpy_s(this->name, _name);
 	}
 }
 const char* Entity::EntityGetName()
@@ -258,6 +258,7 @@ Entity::~Entity()
 		delete component;
 	}
 	components.clear();
+	
 }
 Component* Entity::Get(Component::TypeEnum type) const
 {
