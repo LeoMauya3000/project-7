@@ -31,7 +31,7 @@
 //------------------------------------------------------------------------------
 // Private Variables:
 //------------------------------------------------------------------------------
-static EntityContainer* archetypes = new EntityContainer();
+static EntityContainer* archetypes;
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ Entity* EntityFactoryBuild(const char* filename)
 
 	if (filename)
 	{
-		Entity* archetype = archetypes->EntityContainerFindByName(filename);
+		Entity* archetype = EntityContainerFindByName(archetypes,filename);
 
 		    if(archetype == NULL)
 			{
@@ -61,7 +61,7 @@ Entity* EntityFactoryBuild(const char* filename)
 					if (!strncmp(token, "Entity", _countof("Entity")))
 					{
 						entity->EntityRead(streamFile);
-						archetypes->EntityContainerAddEntity(entity);
+						EntityContainerAddEntity(archetypes,entity);
 						archetype = entity;
 						
 					}
@@ -71,7 +71,7 @@ Entity* EntityFactoryBuild(const char* filename)
 
 			if (archetype)
 			{
-				return &entity->EntityClone(archetype);
+				return archetype->EntityClone();
 			}
 
 
@@ -84,6 +84,6 @@ void EntityFactoryFreeAll()
 {
 	if (archetypes)
 	{
-		archetypes->EntityContainerFreeAll();
+		EntityContainerFreeAll(archetypes);
 	}
 }

@@ -12,11 +12,8 @@
 #include "stdafx.h"
 #include "EntityContainer.h"
 #include "Entity.h"
-#include "Component.h"
-#include "Transform.h"
 #include "Collider.h"
-//#include "Collider.h"
-
+#define MAXENTITYENTRY 100
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
@@ -24,6 +21,26 @@
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
+typedef struct EntityContainer
+{
+	// This variable is not required but could be used for tracking the number
+	//   of Entities currently in the list.  Instructions on how to do this
+	//   are included in the function headers.
+	unsigned entityCount;
+
+	// This variable is not required but could be used for different purposes.
+	// - For storing the maximum size of the container.
+	// - For tracking peak usage of the container, used for testing purposes.
+	unsigned entityMax;
+
+	// This list can be a fixed-length array (minimum size of 100 entries)
+	// or a dynamically sized array, such as a linked list.
+	// (NOTE: The implementation details are left up to the student.  However,
+	//    it is your responsiblity to ensure that memory is handled correctly.)
+	Entity* entities[MAXENTITYENTRY];
+
+} EntityContainer;
+
 //------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
@@ -35,11 +52,11 @@
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
-
+bool ColliderIsColliding(const Collider* collider, const Collider* other);
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
-bool ColliderIsColliding(const Collider* collider, const Collider* other);
+
 // Initialize the ...
 void EntityContainerInit()
 {
@@ -59,161 +76,170 @@ void EntityContainerExit()
 {
 }
 
-//EntityContainer::EntityContainer()
-//{
-//
-//}
- EntityContainer::~EntityContainer()
+EntityContainer* EntityContainerCreate()
 {
-	 EntityContainerFreeAll();
+	EntityContainer* returnedEntityContainer = (EntityContainer*)calloc(1, sizeof(EntityContainer));
+	if (returnedEntityContainer)
+	{
+		returnedEntityContainer->entityMax = MAXENTITYENTRY;
+		for (int i = 0; i < MAXENTITYENTRY; i++)
+		{
+			returnedEntityContainer->entities[i] = 0;
+		}
+		return returnedEntityContainer;
+	}
+
+	return NULL;
+
 }
-bool EntityContainer::EntityContainerAddEntity(Entity* entity)
+void EntityContainerFree(EntityContainer** entities)
 {
-     if(entity)
-	 {
-		 if (this->entityCount < this->entityMax)
-		 {
-			 this->entities.push_back(entity);
-			 this->entityCount++;
-			 return true;
-		 }
-	 }
-	 return false;
+	if (entities && *entities)
+	{
+		free(*entities);
+		*entities = NULL;
+
+	}
+	//yikes maybe 
+
+}
+bool EntityContainerAddEntity(EntityContainer* entities, Entity* entity)
+{
+	if (entities && entity)
+	{
+		if (entities->entityCount < entities->entityMax)
+		{
+			entities->entities[entities->entityCount] = entity;
+
+			if (entities->entities[entities->entityCount])
+			{
+				entities->entityCount++;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-Entity* EntityContainer::EntityContainerFindByName( const char* entityName)
+Entity* EntityContainerFindByName(const EntityContainer* entities, const char* entityName)
 {
-	if (entityName) 
+
+	if (entities && entityName)
 	{
-		for (auto entity : entities)
+		for (unsigned int i = 0; i < entities->entityCount; i++)
 		{
-			if (entity)
+			if (entities->entities[i]->EntityIsNamed(entityName))
 			{
-				if (entity->EntityIsNamed(entityName))
-				{
-					return entity;
-				}
+				return entities->entities[i];
 			}
 		}
 	}
 	return NULL;
 }
-bool EntityContainer::EntityContainerIsEmpty() const
+bool EntityContainerIsEmpty(const EntityContainer* entities)
 {
-	if (this->entityCount == 0)
+
+	//technically a count of 0 means zero entites......
+	if (entities)
 	{
-		return true;
+		if (entities->entityCount == 0)
+		{
+			return true;
+		}
 	}
 	return false;
 }
-void EntityContainer::EntityContainerUpdateAll( float dt)
+void EntityContainerUpdateAll(EntityContainer* entities, float dt)
 {
-	if (this)
+	if (entities)
 	{
-		for (auto entity = entities.begin(); entity != entities.end();)
+		for (unsigned i = 0; i < entities->entityCount; i++)
 		{
-			if (*entity)
+			if (entities->entities[i])
 			{
-				(*entity)->EntityUpdate(dt);
+				entities->entities[i]->EntityUpdate(dt);
 
-				if ((*entity)->EntityIsDestroyed())
+
+				if (entities->entities[i]->EntityIsDestroyed())
 				{
 
-					delete* entity;
-					entity = entities.erase(entity);
-					--entityCount;
-					continue;
+					delete entities->entities[i];
+					for (unsigned int j = i; j < entities->entityCount - 1; j++)
+					{
+						entities->entities[j] = entities->entities[j + 1];
+					}
+					entities->entityCount--;
+					i--;
 				}
 			}
-			  ++entity;
 			
 		}
 	}
 }
-void EntityContainer::EntityContainerRenderAll()
+void EntityContainerRenderAll(const EntityContainer* entities)
 {
-	if (this)
+	if (entities)
 	{
-		for (auto entity : entities)
+		for (unsigned int i = 0; i < entities->entityCount; i++)
 		{
-			if (entity)
+			entities->entities[i]->EntityRender();
+		}
+	}
+}
+void EntityContainerFreeAll(EntityContainer* entities)
+{
+	if (entities)
+	{
+		for (unsigned int i = 0; i < entities->entityCount; i++)
+		{
+			if (entities->entities[i])
 			{
-				entity->EntityRender();
+				delete entities->entities[i];
 			}
 		}
-	}
-}
-void EntityContainer::EntityContainerFreeAll()
-{
-	if (this)
-	{
-		for (auto entity : entities)
-		{
-			
-			
-				delete entity;
-			
-		}
-		this->entities.clear();
-		this->entityCount = 0;
+		entities->entityCount = 0;
 	}
 }
 
-void EntityContainer::ColliderCheck(const Collider* collider, const Collider* other)
+void EntityContainerCheckCollisions(EntityContainer* entities)
 {
-	if (collider && other)
-	{
-		if (ColliderIsColliding(collider, other))
-		{
-			if (collider->ReturnHandler())
-			{
-				collider->ReturnHandler()(collider->Parent(), other->Parent());
-			}
-			if (other->ReturnHandler())
-			{
-				other->ReturnHandler()(other->Parent(), collider->Parent());
-			}
-		}
-	}
-}
-
-void EntityContainer::EntityContainerCheckCollisions()
-{
-
-	
-	if (this)
+	if (entities)
 	{
 		Entity* entityA = NULL;
 		Entity* entityB = NULL;
-		
 
-		for (unsigned int i = 0; i < this->entityCount; ++i)
+		for (unsigned int i = 0; i < entities->entityCount; i++)
 		{
-				if (this->entities[i] && this->entities[i]->Has(Collider))
+			if (entities->entities[i] && entities->entities[i]->Has(Collider))
+			{
+				entityA = entities->entities[i];
+				for (unsigned int j = i + 1; j < entities->entityCount; j++)
 				{
-					entityA = this->entities[i];
-					for (unsigned int j = i + 1; j < this->entityCount; j++)
+					if (!entityB)
 					{
-						if (!entityB)
+						if (entities->entities[j] && entities->entities[i]->Has(Collider))
 						{
-							if (entities[j] && this->entities[j]->Has(Collider))
-							{
-								entityB = this->entities[j];
-							}
-						}
-
-						if (entityA && entityB)
-						{
-							this->ColliderCheck(entityA->Has(Collider), entityB->Has(Collider));
-							entityB = NULL;
+							entityB = entities->entities[j];
 						}
 					}
-					
+
+					if (entityA && entityB)
+					{
+						entityA->Has(Collider)->ColliderCheck(entityA->Has(Collider), entityB->Has(Collider));
+
+						entityB = NULL;
+					}
 				}
+
+			}
 		}
 	}
 }
-//------------------------------------------------------------------------------
-// Private Functions:
-//------------------------------------------------------------------------------
+
+
+
+
+
+
+
 

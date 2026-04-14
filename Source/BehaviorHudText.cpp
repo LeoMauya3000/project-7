@@ -17,47 +17,8 @@
 #include "Sprite.h"
 #include "stream.h"
 
-typedef enum HudTextStates
-{
-	cHudTextInvalid = -1,	// HUD Text has not yet been initialized.
-	cHudTextIdle,			// HUD Text will normally remain static.
 
-} HudTextStates;
-//------------------------------------------------------------------------------
-// Private Constants:
-//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Private Structures:
-//------------------------------------------------------------------------------
-typedef struct BehaviorHudText
-{
-	// Inherit the base behavior structure.
-	Behavior	base;
-
-	// Add HUD Text-specific behavior variables.
-
-	// The index used to access values from the Score System.
-	ScoreSystemId scoreSystemId;
-
-	// The format string to be used with sprintf_s() when updating the HUD Text object.
-	// (For example: "Score: %d")
-	// (NOTE: This buffer has an arbitrary length of 32 chars, which is sufficient for this project.
-	//	Exercise caution when using buffers of a fixed length (e.g. use sprintf_s).
-	char formatString[32];
-
-	// The buffer to be used with sprintf_s() when updating the HUD Text object.
-	// (For example: "Score: 9001")
-	// (NOTE: This buffer has an arbitrary length of 32 chars, which is sufficient for this project.
-	//	Exercise caution when using buffers of a fixed length (e.g. use sprintf_s).
-	char displayString[32];
-
-	// The value currently being displayed by the HUD Text object.
-	// (NOTE: This value can be compared with *watchValue to determine when the text must be updated.)
-	// (NOTE: Make sure to update this value each time the text is updated.)
-	unsigned displayValue;
-
-} BehaviorHudText;
 //------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
@@ -73,93 +34,66 @@ typedef struct BehaviorHudText
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
-static void BehaviorHudTextInit(Behavior* behvaior);
-static void BehaviorHudTextUpdate(Behavior* behavior, float dt);
-static void BehaviorHudTextExit(Behavior* behavior);
-static void BehaviorHudTextUpdateText(BehaviorHudText* behvaiorText);
+
 
 
 
 // Initialize the ...
-static void BehaviorHudTextInit(Behavior* behvaior)
+ void BehaviorHudText::onInit()
 {
-	if (behvaior)
+	if (this)
 	{
-
-		BehaviorHudText* behaviorHudtext = (BehaviorHudText*)behvaior;
-		BehaviorHudTextUpdateText(behaviorHudtext);
-		SpriteSetText(EntityGetSprite(behaviorHudtext->base.parent), behaviorHudtext->displayString);
+		this->BehaviorHudTextUpdateText();
+		this->Parent()->Has(Sprite)->SpriteSetText(this->displayString);
 	}
 }
 
 // Update the ...
 // Params:
 //	 dt = Change in time (in seconds) since the last game loop.
-static void BehaviorHudTextUpdate(Behavior* behavior, float dt)
+ void BehaviorHudText::onUpdate(float dt)
 {
 	UNREFERENCED_PARAMETER(dt);
-	if (behavior)
-	{
-		BehaviorHudText* behaviorHudtext = (BehaviorHudText*)behavior;
-		if (behaviorHudtext)
+		if (this)
 		{
-			unsigned int behaviorHudScore = ScoreSystemGetValue(behaviorHudtext->scoreSystemId);
-			if (behaviorHudtext->displayValue != behaviorHudScore)
+			unsigned int behaviorHudScore = ScoreSystemGetValue(this->scoreSystemId);
+			if (this->displayValue != behaviorHudScore)
 			{
-				BehaviorHudTextUpdateText(behaviorHudtext);
+				this->BehaviorHudTextUpdateText();
 			}
 		}
-	}
 }
 
 // Shutdown the ...
-static void BehaviorHudTextExit(Behavior* behavior)
+void BehaviorHudText::BehaviorHudTextRead( Stream stream)
 {
-	UNREFERENCED_PARAMETER(behavior);
-}
-
-Behavior* BehaviorHudTextCreate(void)
-{
-	BehaviorHudText* behaviorHudText = (BehaviorHudText*)calloc(1, sizeof(BehaviorHudText));
-	if (behaviorHudText)
+	if (stream)
 	{
-		behaviorHudText->base.memorySize = sizeof(BehaviorHudText);
-		behaviorHudText->base.stateCurr = cHudTextInvalid;
-		behaviorHudText->base.stateCurr = cHudTextInvalid;
-		behaviorHudText->base.onInit = &BehaviorHudTextInit;
-		behaviorHudText->base.onUpdate = &BehaviorHudTextUpdate;
-		behaviorHudText->base.onExit = &BehaviorHudTextExit;
-		behaviorHudText->scoreSystemId = SsiInvalid;
-		return (Behavior*)behaviorHudText;
-	}
-	else
-	{
-		return NULL;
-	}
-}
-
-void BehaviorHudTextRead(Behavior* behavior, Stream stream)
-{
-	if (behavior && stream)
-	{
-		BehaviorHudText * behaviorHudtext = (BehaviorHudText*)behavior;
-		BehaviorRead(behavior, stream);
-		strcpy_s(behaviorHudtext->formatString, _countof(behaviorHudtext->formatString), StreamReadToken(stream));
-		behaviorHudtext->scoreSystemId = StreamReadInt(stream);
+		this->BehaviorRead( stream);
+		strcpy_s(this->formatString, _countof(this->formatString), StreamReadToken(stream));
+		this->scoreSystemId = (ScoreSystemId)StreamReadInt(stream);
+		
 	}
 }
 	
-static void BehaviorHudTextUpdateText(BehaviorHudText* behvaiorText)
+ void BehaviorHudText::BehaviorHudTextUpdateText()
 {
-	if (behvaiorText)
+	if (this)
 	{
-		if (behvaiorText->scoreSystemId != SsiInvalid)
+		if (this->scoreSystemId != SsiInvalid)
 		{
-			behvaiorText->displayValue = ScoreSystemGetValue(behvaiorText->scoreSystemId);
-			sprintf_s(behvaiorText->displayString, _countof(behvaiorText->displayString), behvaiorText->formatString, behvaiorText->displayValue);
+			this->displayValue = ScoreSystemGetValue(this->scoreSystemId);
+			sprintf_s(this->displayString, _countof(this->displayString), this->formatString, this->displayValue);
 		}
 	}
 }
+
+
+
+ BehaviorHudText* BehaviorHudText::Clone() const
+ {
+	 return new BehaviorHudText(*this);
+ }
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------

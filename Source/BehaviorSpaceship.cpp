@@ -34,14 +34,7 @@
 // Private Structures:
 //------------------------------------------------------------------------------
 
-typedef enum spaceShipStates
-{
-	cSpaceshipInvalid = -1,
-	cSpaceshipIdle,
-	cSpaceshipThrust,
-	cSpaceshipDead
 
-}spaceShipStates;
 
 
 //------------------------------------------------------------------------------
@@ -61,157 +54,136 @@ typedef enum spaceShipStates
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
-		static void BehaviorSpaceshipOnInit(Behavior* behavior);
-		static void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt);
-		static void BehaviorSpaceshipOnExit(Behavior* behavior);
-		static void BehaviorSpaceshipUpdateRotation(Behavior* behavior, float dt);
-		static void BehaviorSpaceshipUpdateVelocity(Behavior* behavior, float dt);
-		static void BehaviorSpaceshipUpdateWeapon(Behavior* behavior, float dt);
-		static void BehaviorSpaceshipSpawnBullet(Behavior* behavior);
-	    static void BehaviorSpaceshipCollisionHandler(Entity* entity1, const Entity* entity2);
 
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-
-Behavior* BehaviorSpaceshipCreate(void)
-{
-	Behavior* spaceShipBehavior = calloc(1, sizeof(Behavior));
-	if (spaceShipBehavior)
-	{
-		spaceShipBehavior->stateCurr = cSpaceshipInvalid;
-		spaceShipBehavior->stateNext = cSpaceshipInvalid;
-		spaceShipBehavior->memorySize = sizeof(Behavior);
-		spaceShipBehavior->onInit = &BehaviorSpaceshipOnInit;
-		spaceShipBehavior->onUpdate = &BehaviorSpaceshipOnUpdate;
-		spaceShipBehavior->onExit = &BehaviorSpaceshipOnExit;
-		return spaceShipBehavior;
-	}
-	return NULL;	
-}
-
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------
 
-static void BehaviorSpaceshipOnInit(Behavior* behavior)
+ void BehaviorSpaceship::onInit()
 {
 
-	if (behavior)
+	if (this)
 	{
-		if (behavior->stateCurr == cSpaceshipIdle)
+		if (this->getStateCurr() == cSpaceshipIdle)
 		{
-			Collider* behaviorCollider = EntityGetCollider(behavior->parent);
+			Collider* behaviorCollider = this->Parent()->Has(Collider);
 			if (behaviorCollider)
 			{
-				ColliderSetCollisionHandler(behaviorCollider, BehaviorSpaceshipCollisionHandler);
+				//ColliderSetCollisionHandler(behaviorCollider, BehaviorSpaceshipCollisionHandler);
 			}
 		}
-		if (behavior->stateCurr == cSpaceshipDead)
+		if (this->getStateCurr() == cSpaceshipThrust)
 		{
-			behavior->timer = spaceshipDeathDuration;
+			this->setTimer(spaceshipDeathDuration);
 		}
 	}
 }
-static void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt)
+ void BehaviorSpaceship::onUpdate( float dt)
 {
-	switch (behavior->stateCurr)
+	switch (this->getStateCurr())
 	{
 	  case cSpaceshipIdle:
 	  {
-		  BehaviorSpaceshipUpdateRotation(behavior, dt);
-		  BehaviorSpaceshipUpdateWeapon(behavior, dt);
+		  this->BehaviorSpaceshipUpdateRotation(dt);
+		  this->BehaviorSpaceshipUpdateWeapon(dt);
 		  if (DGL_Input_KeyDown(VK_UP))
 		  {
-			  behavior->stateNext = cSpaceshipThrust;
+			  this->setStateNext(BehaviorSpaceship::cSpaceshipThrust);
 		  }
 		  break;
 	  }
 		  
 	  case cSpaceshipThrust:
 	  {
-		  BehaviorSpaceshipUpdateRotation(behavior, dt);
-		  BehaviorSpaceshipUpdateVelocity(behavior, dt);
-		  BehaviorSpaceshipUpdateWeapon(behavior, dt);
+		  this->BehaviorSpaceshipUpdateRotation(dt);
+		  this->BehaviorSpaceshipUpdateVelocity(dt);
+		  this->BehaviorSpaceshipUpdateWeapon(dt);
 		  if (!DGL_Input_KeyDown(VK_UP))
 		  {
-			  behavior->stateNext = cSpaceshipIdle;
+			  this->setStateNext(BehaviorSpaceship::cSpaceshipIdle);
 		  }
 		  break;
 	  }  
 	  case cSpaceshipDead: 
 	  {
-		  behavior->timer -= dt;
-		  if (behavior->timer < 0)
+		  float setTime = this->getTimer();
+		  setTime -= dt;
+		  this->setTimer(setTime);
+		  if (this->getTimer() < 0)
 		  {
 			  SceneRestart();
 		  }
 		  else
 		  {
-			  Transform* parentTransform = EntityGetTransform(behavior->parent);
-			  Sprite* parentSprite = EntityGetSprite(behavior->parent);
+			  Transform* parentTransform = this->Parent()->Has(Transform);
+			  Sprite* parentSprite = this->Parent()->Has(Sprite);
 			  if (parentTransform && parentSprite)
 			  {
-				  float parentAlpha = SpriteGetAlpha(parentSprite);
-				  Vector2D scale = *TransformGetScale(parentTransform);
-				  float rotation = TransformGetRotation(parentTransform);
+				  float parentAlpha = parentSprite->SpriteGetAlpha();
+				  Vector2D scale = *parentTransform->TransformGetScale();
+				  float rotation = parentTransform->TransformGetRotation();
 				  scale.x += 90 * dt;
 				  scale.y += 130 * dt;	
 				  rotation += 10 * dt;
 
-				  TransformSetScale(parentTransform, &scale);
-				  TransformSetRotation(parentTransform, rotation);
-				  behavior->timer -= dt;
-			      SpriteSetAlpha(parentSprite, parentAlpha -= dt);
+				  parentTransform->TransformSetScale(&scale);
+				  parentTransform->TransformSetRotation(rotation);
+				  setTime -= dt;
+				  this->setTimer(setTime);
+				  parentSprite->SpriteSetAlpha(parentAlpha -= dt);
+
 			  }
 		  }
 	  }
 	}
 
-	TeleporterUpdateEntity(behavior->parent);
+	TeleporterUpdateEntity(this->Parent());
 }
-static void BehaviorSpaceshipOnExit(Behavior* behavior)
+ void BehaviorSpaceship::onExit()
 {
-	UNREFERENCED_PARAMETER(behavior);
+	
 }
-static void BehaviorSpaceshipUpdateRotation(Behavior* behavior, float dt)
+ void BehaviorSpaceship::BehaviorSpaceshipUpdateRotation(float dt)
 {
 	UNREFERENCED_PARAMETER(dt);
 
-	if (behavior)
+	if (this)
 	{
-		Physics* physicsComponent = EntityGetPhysics(behavior->parent);
-		float rotationVelocity = PhysicsGetRotationalVelocity(physicsComponent);
+		Physics* physicsComponent =  this->Parent()->Has(Physics);
+		float rotationVelocity = physicsComponent->PhysicsGetRotationalVelocity();
 
 		if (DGL_Input_KeyDown(VK_LEFT))
 		{
 			rotationVelocity = spaceshipTurnRateMax;
-			PhysicsSetRotationalVelocity(physicsComponent, rotationVelocity);
+			physicsComponent->PhysicsSetRotationalVelocity(rotationVelocity);
 		}
 		else if (DGL_Input_KeyDown(VK_RIGHT))
 		{
 			rotationVelocity = -spaceshipTurnRateMax;
-			PhysicsSetRotationalVelocity(physicsComponent, rotationVelocity);
+			physicsComponent->PhysicsSetRotationalVelocity(rotationVelocity);
 		}
 		else
 		{
-			PhysicsSetRotationalVelocity(physicsComponent, 0);
+			physicsComponent->PhysicsSetRotationalVelocity(0);
 		}
 	}
 }
- void BehaviorSpaceshipUpdateVelocity(Behavior* behavior, float dt)
+ void BehaviorSpaceship::BehaviorSpaceshipUpdateVelocity(float dt)
 {
-	if (behavior)
+	if (this)
 	{
-		Physics *physcicsComponenet = EntityGetPhysics(behavior->parent);
-		Transform *transformComponent = EntityGetTransform(behavior->parent);
+		Physics* physcicsComponenet = this->Parent()->Has(Physics);
+		Transform* transformComponent =  this->Parent()->Has(Transform);
 		if (physcicsComponenet && transformComponent)
 		{ 
 			float speed;
 			float scalar = spaceshipAcceleration * dt;
-			float rotation = TransformGetRotation(transformComponent);
-			Vector2D velocity = *PhysicsGetVelocity(physcicsComponenet);
+			float rotation = transformComponent->TransformGetRotation();
+			Vector2D velocity = *physcicsComponenet->PhysicsGetVelocity();
 			Vector2D unitVector;
 			Vector2DFromAngleRad(&unitVector, rotation);
 			Vector2DNormalize(&unitVector, &unitVector);
@@ -222,56 +194,58 @@ static void BehaviorSpaceshipUpdateRotation(Behavior* behavior, float dt)
 			{
 				Vector2DScale(&velocity,&velocity, speedCap);
 			}
-			PhysicsSetVelocity(physcicsComponenet,&velocity);
+			physcicsComponenet->PhysicsSetVelocity(&velocity);
 		}
 
 	}
 }
-static void BehaviorSpaceshipUpdateWeapon(Behavior* behavior, float dt)
+void BehaviorSpaceship::BehaviorSpaceshipUpdateWeapon(float dt)
 {
-	if (behavior->timer > 0)
+	if (this->getTimer() > 0)
 	{
-		behavior->timer -= dt;
-		if (behavior->timer < 0)
+		float time = this->getTimer();
+		time -= dt;
+		this->setTimer(time);
+		if (this->getTimer() < 0)
 		{
-			behavior->timer = 0;
+			this->setTimer(0);
 		}
     }
 	if (DGL_Input_KeyDown(VK_SPACE))
 	{
-		if (behavior->timer <= 0)
+		if (this->getTimer() <= 0)
 		{
 		
-			BehaviorSpaceshipSpawnBullet(behavior);
-			behavior->timer = spaceshipWeaponCooldownTime;
+			this->BehaviorSpaceshipSpawnBullet();
+			this->setTimer(spaceshipWeaponCooldownTime);
 		}
 	}
 }
-static void BehaviorSpaceshipSpawnBullet(Behavior* behavior)
+void BehaviorSpaceship::BehaviorSpaceshipSpawnBullet()
 {
 	Entity *bullet = NULL;
 
 	
-	bullet = EntityFactoryBuild("Bullet");
+ 	bullet = EntityFactoryBuild("Bullet");
 	if (bullet)
 	{
 
-		Transform* SpaceShiptransformComponent = EntityGetTransform(behavior->parent);
-		Physics* physicsComponentBullet = EntityGetPhysics(bullet);
+		Transform* SpaceShiptransformComponent = this->Parent()->Has(Transform);
+		Physics* physicsComponentBullet = bullet->Has(Physics);
 		if (SpaceShiptransformComponent && physicsComponentBullet)
 		{
-			Vector2D SpaceShipPosition = *TransformGetTranslation(SpaceShiptransformComponent);
-			float SpaceShipRotation = TransformGetRotation(SpaceShiptransformComponent);
-			Transform* bulletTransformComponent = EntityGetTransform(bullet);
+			Vector2D SpaceShipPosition = *SpaceShiptransformComponent->TransformGetTranslation();
+			float SpaceShipRotation = SpaceShiptransformComponent->TransformGetRotation();
+			Transform* bulletTransformComponent = bullet->Has(Transform);
 			Vector2D bulletPosition = SpaceShipPosition;
-			Vector2D bulletVelocity = *PhysicsGetVelocity(physicsComponentBullet);
+			Vector2D bulletVelocity = *physicsComponentBullet->PhysicsGetVelocity();
 			Vector2D nomarlizedDirection;
-			TransformSetRotation(bulletTransformComponent, SpaceShipRotation);
+		    bulletTransformComponent->TransformSetRotation(SpaceShipRotation);
 			Vector2DFromAngleRad(&nomarlizedDirection, SpaceShipRotation);
 			Vector2DNormalize(&nomarlizedDirection, &nomarlizedDirection);
 			Vector2DScale(&bulletVelocity, &nomarlizedDirection, spaceshipWeaponBulletSpeed);
-			PhysicsSetVelocity(physicsComponentBullet, &bulletVelocity);
-			TransformSetTranslation(bulletTransformComponent, &bulletPosition);
+	        physicsComponentBullet->PhysicsSetVelocity(&bulletVelocity);
+            bulletTransformComponent->TransformSetTranslation(&bulletPosition);
 			SceneAddEntity(bullet);
 
 		}
@@ -280,26 +254,23 @@ static void BehaviorSpaceshipSpawnBullet(Behavior* behavior)
 	}
 }
 
-static void BehaviorSpaceshipCollisionHandler(Entity* entity1, const Entity* entity2)
+ void BehaviorSpaceship::BehaviorSpaceshipCollisionHandler(Entity* entity1, const Entity* entity2)
 {
 	if (entity1 && entity2)
 	{
-		if ((!strncmp(EntityGetName(entity2), "Asteroid", _countof("Asteroid"))))
+		if ((!strncmp(entity2->EntityGetName(), "Asteroid", _countof("Asteroid"))))
 		{
-			Behavior* entity1Behavior = EntityGetBehavior(entity1);
-			if (entity1Behavior)
+			Behavior* entity1Behavior = entity1->Has(Behavior);
+			if (entity1)
 			{
-				entity1Behavior->stateNext = cSpaceshipDead;
-
+				entity1Behavior->setStateNext(BehaviorSpaceship::cSpaceshipDead);
 			}
-		}
-		//do reflections here 
-		if ((!strncmp(EntityGetName(entity2), "Arena", _countof("Arena"))))
-		{
-		
-
-			printf("you hit the arena!! \n \n \n");
 		}
 	}
 }
+
+ BehaviorSpaceship* BehaviorSpaceship::Clone() const
+ {
+	 return new BehaviorSpaceship(*this);
+ }
 

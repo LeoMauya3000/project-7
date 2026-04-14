@@ -73,6 +73,7 @@
     <ClCompile Include="Source\ColliderLine.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AsteroidsScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseSystem.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Source\ColliderLine.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="Source\AsteroidsScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Components">

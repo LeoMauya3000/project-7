@@ -38,25 +38,24 @@ class Collider : public Component
 		ColliderTypeNone,
 		ColliderTypeCircle,
 		ColliderTypeLine,
-		DEFAULT
-
 	};
-	   Collider() : Component(Component::cCollider),colliderType(DEFAULT),handler(NULL),memorySize(0){};
-	   ~Collider() {};
-	   Collider(ColliderType type_) : colliderType(type_), handler(NULL), memorySize(0){}
-	   Collider* Clone() const override;
-	   void ColliderSetCollisionHandler(CollisionEventHandler handler);
-	   Collider::ColliderType ReturnColliderType() const { return colliderType; } 
+	   Collider() : Component(Component::cCollider),handler(NULL){};
+	   virtual ~Collider() = 0 {};
+	   Collider(ColliderType type_) : colliderType(type_), handler(NULL), Component(Component::cCollider) {};
+	   virtual Collider* Clone() const = 0;
+	 
+	   ColliderType ReturnColliderType() const { return colliderType; } 
 	   CollisionEventHandler ReturnHandler() const { return handler; }
-
+	   void ColliderSetCollisionHandler(CollisionEventHandler handler);
+	   void ColliderCheck(const Collider* collider, const Collider* other);
+	   bool ColliderIsColliding(const Collider* collider, const Collider* other);
 
     private:
-
+		 
 	ColliderType colliderType;
 
 	CollisionEventHandler	handler;
 
-	unsigned int	memorySize;
 
 };
 

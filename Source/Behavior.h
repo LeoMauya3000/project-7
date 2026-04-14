@@ -11,52 +11,60 @@
 
 #pragma once
 #include "Component.h"
-//------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
+#include "Entity.h"
 
 typedef FILE* Stream;
-
-//------------------------------------------------------------------------------
-// Public Consts:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Structures:
-//------------------------------------------------------------------------------
-
-
-
 class Entity;
 
-typedef struct Behavior : public Component
+class Behavior : public Component
 {
-
-	typedef void(*BehaviorFunctionPtr)(Behavior* behavior);
-	typedef void(*BehaviorFunctionPtrDt)(Behavior* behavior, float dt);
 public:
-	Behavior() : Component(Component::cBehavior), memorySize(0), timer(0), stateCurr(0),stateNext(0), onInit(NULL),onUpdate(NULL),onExit(NULL) {};
-	~Behavior() override {};
+	Behavior() : Component(Component::cBehavior), timer(0), stateCurr(0), stateNext(0){};
+	virtual ~Behavior() = 0 {};
 
-	Behavior* Clone() const override;
+	virtual Behavior* Clone() const = 0;
 
 	void BehaviorRead(Stream stream);
 
-	void Update(float dt) override;
+	int getStateCurr() { return stateCurr; };
+
+	int getStateNext() { return stateNext; };
+
+	float getTimer() { return timer; };
+	
+	template<typename state>
+	void setStateCurr(state _state)
+	{
+		stateCurr = static_cast<int>(_state);
+	}
+
+
+	void setTimer(float time)
+	{
+		timer = time;
+	}
+	
+
+	template<typename state>  
+	void setStateNext(state _state)
+	{
+		stateNext = static_cast<int>(_state);
+	}
+
+
+   void Update(float dt) override;
+
+	void virtual onUpdate(float dt) = 0;
+
+	void virtual onInit() = 0;
+
+	void virtual onExit() = 0;
+
+
 
 private:
-	unsigned int memorySize;
+	float	timer;
 	int stateCurr;		
 	int stateNext;
-	BehaviorFunctionPtr		onInit;
-	BehaviorFunctionPtrDt	onUpdate;
-	BehaviorFunctionPtr		onExit;
-	float	timer;
 
 };

@@ -16,7 +16,7 @@
 #include "CheatSystem.h"
 #include "level1Scene.h"
 #include "level2Scene.h"
-//#include "AsteroidsScene.h"
+#include "AsteroidsScene.h"
 #include "OmegaScene.h"
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -45,7 +45,7 @@ typedef struct CheatSystemKeyBinding
 
 static const CheatSystemKeyBinding keyBindings[] =
 {
-	{'1',Level1SceneGetInstance}, { '2',level2SceneGetInstance }
+	{'1',Level1SceneGetInstance}, { '2',level2SceneGetInstance } , {'3', AsteriodSceneGetInstance} , {'4', OmegaSceneGetInstance}
 };
 //------------------------------------------------------------------------------
 // Public Variables:

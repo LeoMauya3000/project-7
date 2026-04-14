@@ -20,72 +20,9 @@
 #include "Physics.h"
 #define cLineSegmentMax 8
 
-
-
-//------------------------------------------------------------------------------
-// Private Constants:
-//------------------------------------------------------------------------------
-typedef struct ColliderLineSegment
+void ColliderLine::ColliderLineRead(Stream stream)
 {
-	// A single line segment (P0 and P1).
-	Vector2D	point[2];
-} ColliderLineSegment;
-
-
-typedef struct ColliderLine
-{
-	// Inherit the base collider structure.
-	Collider	base;
-
-	// The number of line segments in the list.
-	unsigned int		lineCount;
-
-	// The individual line segments.
-	// (NOTE: Make sure to allocate enough memory for all line segments!)
-	ColliderLineSegment	lineSegments[cLineSegmentMax];
-
-} ColliderLine;
-
-//------------------------------------------------------------------------------
-// Private Structures:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Function Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Functions:
-//------------------------------------------------------------------------------
-
-// Initialize the ...
-
-
-Collider* ColliderLineCreate(void)
-{
-	ColliderLine* colliderLine = (ColliderLine*)calloc(1, sizeof(ColliderLine));
-	if (colliderLine)
-	{
-		colliderLine->base.memorySize = sizeof(ColliderLine);
-		colliderLine->base.type = ColliderTypeLine;
-		return (Collider*)colliderLine;
-	}
-	else
-	{
-		return false;
-	}
-}
-void ColliderLineRead(Collider* collider, Stream stream)
-{
-	if (collider && stream)
+	if (stream)
 	{
 		int numberOfLines = StreamReadInt(stream);
 		Vector2D p0;
@@ -94,44 +31,44 @@ void ColliderLineRead(Collider* collider, Stream stream)
 		{
 			StreamReadVector2D(stream, &p0);
 			StreamReadVector2D(stream, &p1);
-			ColliderLineAddLineSegment(collider, &p0, &p1);
+			this->ColliderLineAddLineSegment(&p0, &p1);
+			
 		}
 	}
 }
-void ColliderLineAddLineSegment(Collider* collider, const Vector2D* p0, const Vector2D* p1)
+void  ColliderLine::ColliderLineAddLineSegment(const Vector2D* p0, const Vector2D* p1)
 {
-	if (collider && p0 && p1)
+	if (p0 && p1)
 	{
-		ColliderLine* colliderLine = (ColliderLine*)collider;
-		colliderLine->lineSegments[colliderLine->lineCount].point[0] = *p0;
-		colliderLine->lineSegments[colliderLine->lineCount].point[1] = *p1;
-		colliderLine->lineCount++;
+		this->lineSegments[this->lineCount].point[0] = *p0;
+		this->lineSegments[this->lineCount].point[1] = *p1;
+		this->lineCount++;
 	
 	}
 }
-bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider* other)
+bool ColliderLine::ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider* other)
 {
-	//CHECK THIS FUNCTION LATER DOWN THE ROAD THIS MAY OR MAY NOT BE THE BANE OF ALL EVIL ^^
+
 	if (collider && other)
 	{
 		Physics* physcisComponent = NULL;
 		Transform* transformComponent = NULL;
 		ColliderLine* colliderLine1 = NULL;
-		if (EntityGetPhysics(other->parent) && EntityGetTransform(other->parent))
+		if (other->Parent()->Has(Physics) && other->Parent()->Has(Transform))
 		{
-			physcisComponent = EntityGetPhysics(other->parent);
-			transformComponent = EntityGetTransform(other->parent);
+			physcisComponent = other->Parent()->Has(Physics);
+			transformComponent = other->Parent()->Has(Transform);
 		}
-		if (EntityGetPhysics(collider->parent) && EntityGetTransform(collider->parent))
+		if (collider->Parent()->Has(Physics) && collider->Parent()->Has(Transform))
 		{
-			physcisComponent = EntityGetPhysics(collider->parent);
-			transformComponent = EntityGetTransform(collider->parent);
+			physcisComponent = collider->Parent()->Has(Physics);
+			transformComponent = collider->Parent()->Has(Transform);
 		}
-		if (other->type == ColliderTypeLine)
+		if (other->ReturnColliderType() == ColliderTypeLine)
 		{
 			colliderLine1 = (ColliderLine*)other;
 		}
-		if (collider->type == ColliderTypeLine)
+		if (collider->ReturnColliderType() == ColliderTypeLine)
 		{
 			colliderLine1 = (ColliderLine*)collider;
 		}
@@ -148,8 +85,8 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 				Vector2D p0 = colliderLine1->lineSegments[i].point[0];
 				Vector2D p1 = colliderLine1->lineSegments[i].point[1];
 
-				Vector2D bS = *PhysicsGetOldTranslation(physcisComponent);
-				Vector2D bE = *TransformGetTranslation(transformComponent);
+				Vector2D bS = * physcisComponent->PhysicsGetOldTranslation();
+				Vector2D bE = *transformComponent->TransformGetTranslation();
 
 				Vector2D bI;
 
@@ -178,12 +115,18 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 				}
 				//trivial checks end
 
-				if (Vector2DDotProduct(&(Vector2D){p1.x - p0.x, p1.y - p0.y }, &(Vector2D){ bI.x - p0.x, bI.y - p0.y }) < 0)
+				Vector2D side1 = { p1.x - p0.x, p1.y - p0.y };
+				Vector2D side2 = { bI.x - p0.x, bI.y - p0.y };
+
+				if (Vector2DDotProduct(&side1, &side2) < 0)
 				{
 					
 					continue;
 				}
-				if (Vector2DDotProduct(&(Vector2D) { p0.x - p1.x, p0.y - p1.y }, & (Vector2D) { bI.x - p1.x, bI.y - p1.y }) < 0)
+				side1 = { p0.x - p1.x, p0.y - p1.y };
+				side2 = { bI.x - p1.x, bI.y - p1.y };
+
+				if (Vector2DDotProduct(&side1, &side2) < 0)
 				{
 					//uhhh maybe??
 
@@ -204,7 +147,7 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 					Vector2D incidentVec;
 					Vector2D reflectionVec;
 					Vector2D bR;
-					Vector2D oldVelocity = *PhysicsGetVelocity(physcisComponent);
+					Vector2D oldVelocity = *physcisComponent->PhysicsGetVelocity();
 					Vector2D velocity;
 					
 					Vector2DSub(&incidentVec, &bE, &bI);
@@ -216,10 +159,9 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 					reflectAngle = Vector2DToAngleRad(&reflectionVec);
 					speed = Vector2DLength(&oldVelocity);
 					Vector2DNormalize(&reflectionVec,&reflectionVec);
-					Vector2DScale(&velocity, &reflectionVec, speed);
-					PhysicsSetVelocity(physcisComponent, &velocity);
-					TransformSetRotation(transformComponent, reflectAngle);
-					TransformSetTranslation(transformComponent, &bR);
+					physcisComponent->PhysicsSetVelocity(&velocity);
+			        transformComponent->TransformSetRotation(reflectAngle);
+				     transformComponent->TransformSetTranslation(&bR);
 					return true; 
 				}
 			
@@ -232,6 +174,12 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 		return false;
 	}
 	
+}
+
+
+ColliderLine* ColliderLine::Clone() const
+{
+	return new ColliderLine(*this);
 }
 
 

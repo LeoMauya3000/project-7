@@ -17,14 +17,14 @@
 #include "Transform.h"
 #include "Animation.h"
 #include "Component.h"
-//#include "Behavior.h"
-//#include "BehaviorSpaceship.h"
-//#include "BehaviorBullet.h"
-//#include "Collider.h"
-//#include "BehaviorAsteroid.h"
-//#include "BehaviorHudText.h"
-//#include "ColliderCircle.h"
-//#include "ColliderLine.h"
+#include "Behavior.h"
+#include "BehaviorSpaceship.h"
+#include "BehaviorBullet.h"
+#include "Collider.h"
+#include "BehaviorAsteroid.h"
+#include "BehaviorHudText.h"
+#include "ColliderCircle.h"
+#include "ColliderLine.h"
 
 
 //------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void Entity::EntitySetName(const char* _name)
 		strcpy_s(this->name, _name);
 	}
 }
-const char* Entity::EntityGetName()
+const char* Entity::EntityGetName() const
 {
 	return this->name;
 }
@@ -170,9 +170,49 @@ void Entity::EntityRender()
 }
 
 
-Entity& Entity::EntityClone(const Entity* other)
+Entity* Entity::EntityClone()
 {
-		return *this = *other;	
+	if (this)
+	{
+		Entity* clonedEntity = new Entity();
+		if (clonedEntity)
+		{
+			clonedEntity->EntitySetName(this->EntityGetName());
+			if (this->Has(Transform))
+			{
+				Transform* transform = this->Has(Transform)->Clone();
+				clonedEntity->EntityAddComponent(transform);
+			}
+			if (this->Has(Physics))
+			{
+				Physics* physics = this->Has(Physics)->Clone();
+				clonedEntity->EntityAddComponent(physics);
+			}
+			if (this->Has(Sprite))
+			{
+				Sprite* sprite = this->Has(Sprite)->Clone();
+				clonedEntity->EntityAddComponent(sprite);
+			}
+			if (this->Has(Animation))
+			{
+				Animation* animation = this->Has(Animation)->Clone();
+				clonedEntity->EntityAddComponent(animation);
+			}
+			if (this->Has(Behavior))
+			{
+				Behavior* behvaior = this->Has(Behavior)->Clone();
+				clonedEntity->EntityAddComponent(behvaior);
+			}
+			if (this->Has(Collider))
+			{
+				Collider* collider = this->Has(Collider)->Clone();
+				clonedEntity->EntityAddComponent(collider);
+			}
+
+			return clonedEntity;
+		}
+	}
+	return NULL;
 }
 void Entity::EntityRead(Stream stream)
 {
@@ -205,6 +245,42 @@ void Entity::EntityRead(Stream stream)
 			Animation* animation = new Animation();
 			animation->AnimationRead(stream);
 			this->EntityAddComponent(animation);
+		}
+		else if (!strncmp(token, "BehaviorHudText", _countof("BehaviorHudText")))
+		{
+			
+			BehaviorHudText* behaviorHudText = new BehaviorHudText(stream);
+			this->EntityAddComponent(behaviorHudText);
+		}
+		else if (!strncmp(token, "BehaviorAsteroid", _countof("BehaviorAsteroid")))
+		{
+
+			BehaviorAsteroid* behaviorAsteroid = new BehaviorAsteroid(stream);
+			this->EntityAddComponent(behaviorAsteroid);
+		}
+		else if (!strncmp(token, "BehaviorBullet", _countof("BehaviorBullet")))
+		{
+
+			BehaviorBullet* behaviorBullet = new BehaviorBullet(stream);
+			this->EntityAddComponent(behaviorBullet);
+		}
+		else if (!strncmp(token, "BehaviorSpaceship", _countof("BehaviorSpaceship")))
+		{
+
+			BehaviorSpaceship* behaviorBullet = new BehaviorSpaceship(stream);
+			this->EntityAddComponent(behaviorBullet);
+		}
+		else if (!strncmp(token, "ColliderCircle", _countof("ColliderCircle")))
+		{
+
+			ColliderCircle* colliderCircle = new ColliderCircle(stream);
+			this->EntityAddComponent(colliderCircle);
+		}
+		else if (!strncmp(token, "ColliderLine", _countof("ColliderLine")))
+		{
+
+			ColliderLine* colliderLine = new ColliderLine(stream);
+			this->EntityAddComponent(colliderLine);
 		}
 		else if (strcmp(token, "") == 0)
 		{

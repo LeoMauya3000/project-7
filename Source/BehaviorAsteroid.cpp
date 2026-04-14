@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include "BehaviorAsteroid.h"
-#include "Behavior.h"
 #include "Random.h"
 #include  "Collider.h"
 #include "Entity.h"
@@ -47,179 +46,89 @@ static const float asteroidSpeedMax = 100.0f;
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
-
-typedef enum asteriodStates
+ void BehaviorAsteroid::onInit()
 {
-	cAsteroidInvalid = -1,
-	cAsteroidIdle = 0,
-}asteriodStates;
-
-typedef enum
-{
-	cAsteroidOriginTlc,
-	cAsteroidOriginTrc,
-	cAsteroidOriginBlc,
-	cAsteroidOriginBrc,
-	cAsteroidOriginCount,
-
-}AsteroidOrigin;
-
-typedef struct BehaviorAsteroid
-{
-	// Inherit the base behavior structure.
-	Behavior	base;
-
-	// Add asteroid-specific behavior variables.
-	AsteroidOrigin	origin;
-
-} BehaviorAsteroid;
-
-static void BehaviorAsteroidInit(Behavior* asteriodBehavior);
-static void BehaviorAsteroidUpdate(Behavior* asteriodBehavior, float dt);
-static void BehaviorAsteroidExit(Behavior* asteriodBehavior);
-static void BehaviorAsteroidSetPosition(BehaviorAsteroid* behavior);
-static void BehaviorAsteroidSetVelocity(BehaviorAsteroid* behavior);
-static void BehaviorAsteroidCollisionHandler(Entity* obj1, const Entity* obj2);
-
-
-
-
-
-
-
-
-// Initialize the ...
-
-
-// Update the ...
-// Params:
-//	 dt = Change in time (in seconds) since the last game loop.
-void BehaviorAsteriodUpdate(float dt)
-{
-	/* Tell the compiler that the 'dt' variable is unused. */
-	UNREFERENCED_PARAMETER(dt); 
-}
-
-// Shutdown the ...
-void BehaviorAsteriodExit()
-{
-}
-Behavior* BehaviorAsteroidCreate(void)
-{
-	BehaviorAsteroid* asteriod = (BehaviorAsteroid*)calloc(1, sizeof(BehaviorAsteroid));
-	if (asteriod)
-	{
-		asteriod->base.stateCurr = cAsteroidInvalid;
-		asteriod->base.stateNext = cAsteroidInvalid;
-		asteriod->base.memorySize = sizeof(BehaviorAsteroid);
-		asteriod->base.onInit = &BehaviorAsteroidInit;
-		asteriod->base.onUpdate = &BehaviorAsteroidUpdate;
-		asteriod->base.onExit = &BehaviorAsteroidExit;
-		return (Behavior*)asteriod;
-	}
-
-	return NULL;
-}
-
-
- void BehaviorAsteroidInit(Behavior* asteriodBehavior)
-{
-	BehaviorAsteroid* behaviorAsteriod = (BehaviorAsteroid*)asteriodBehavior;
-
-	if (asteriodBehavior->stateCurr == cAsteroidIdle)
+	if (this->getStateCurr() == cAsteroidIdle)
 	{
 		
-		behaviorAsteriod->origin = RandomRange(0, 3);
-		BehaviorAsteroidSetPosition(behaviorAsteriod);
-		BehaviorAsteroidSetVelocity(behaviorAsteriod);
-		Collider* parentEntityCollider = EntityGetCollider(asteriodBehavior->parent);
+		this->origin = (AsteroidOrigin)RandomRange(0, 3);
+		this->BehaviorAsteroidSetPosition();
+		this->BehaviorAsteroidSetVelocity();
+		Collider* parentEntityCollider = this->Parent()->Has(Collider);
 		if (parentEntityCollider)
 		{
-			ColliderSetCollisionHandler(parentEntityCollider, BehaviorAsteroidCollisionHandler);
+		/*	parentEntityCollider->ColliderSetCollisionHandler(BehaviorAsteroidCollisionHandler);*/
 		}
 		
 	}
 
 }
- void BehaviorAsteroidUpdate(Behavior* asteriodBehavior, float dt)
+ void BehaviorAsteroid::onUpdate(float dt)
 {
 	UNREFERENCED_PARAMETER(dt);
-	if (asteriodBehavior)
+	if (this)
 	{
-		// okay whats actually gotta go here lmao 
-		/*switch (asteriodBehavior->stateCurr)
-		{
-		  case cAsteroidIdle:
-		  {
-			  BehaviorAsteroidSetPosition((BehaviorAsteroid*)asteriodBehavior);
-			  BehaviorAsteroidSetVelocity((BehaviorAsteroid*)asteriodBehavior);
-			  break;
-		  }
-		  default:
-		  {
-			  break;
-		  }
-		}*/
-	 TeleporterUpdateEntity(asteriodBehavior->parent);
+	 TeleporterUpdateEntity(Parent());
 	}
 }
- void BehaviorAsteroidExit(Behavior* asteriodBehavior)
-{
-	UNREFERENCED_PARAMETER(asteriodBehavior);
-}
- void BehaviorAsteroidSetPosition(BehaviorAsteroid* behavior)
+ void BehaviorAsteroid::BehaviorAsteroidSetPosition()
 {
 	Vector2D screenSize = DGL_Window_GetSize();
 	Vector2D halfSize;
 	Vector2DScale(&halfSize, &screenSize, 0.5f);
-	if (behavior)
+	if (this)
 	{
-		Transform* entityTransform = EntityGetTransform(behavior->base.parent);
+		Transform* entityTransform = this->Parent()->Has(Transform);
 		if (entityTransform)
 		{
-			switch (behavior->origin)
+			switch (this->origin)
 			{
 			    case cAsteroidOriginTlc:
 			    {
-				 TransformSetTranslation(entityTransform, &(Vector2D) { -halfSize.x, halfSize.y });
+				 Vector2D corner = { -halfSize.x, halfSize.y };
+				 entityTransform->TransformSetTranslation(&corner);
 				 break;
 			    }
 				case cAsteroidOriginTrc:
 				{
-				 TransformSetTranslation(entityTransform, &(Vector2D){halfSize.x, halfSize.y});
+					Vector2D corner = { halfSize.x , halfSize.y };
+					entityTransform->TransformSetTranslation(&corner);
 				 break;
 				}
 				case cAsteroidOriginBlc:
 				{
-				TransformSetTranslation(entityTransform, &(Vector2D){-halfSize.x, -halfSize.y});
+					Vector2D corner = { -halfSize.x, -halfSize.y };
+			     	entityTransform->TransformSetTranslation(&corner);
 				break;
 				}
 				case cAsteroidOriginBrc:
 				{
-				TransformSetTranslation(entityTransform, &(Vector2D){halfSize.x, -halfSize.y});
+					Vector2D corner = { halfSize.x, -halfSize.y };
+					entityTransform->TransformSetTranslation(&corner);
 				break;
 				}
 				default:
 				{
-					TransformSetTranslation(entityTransform, &(Vector2D){0,0});
+					DGL_Vec2 zeroVec = { 0,0 };
+					entityTransform->TransformSetTranslation(&zeroVec);
 					break;
 				}
 			}
 		}
 	}
 }
- void BehaviorAsteroidSetVelocity(BehaviorAsteroid* behavior)
+ void BehaviorAsteroid::BehaviorAsteroidSetVelocity()
 {
-	if (behavior)
+	if (this)
 	{
 		float angle;
 		Vector2D velocity;
-		Physics* entityPhysics = EntityGetPhysics(behavior->base.parent);
+		Physics* entityPhysics = this->Parent()->Has(Physics);
 		if (entityPhysics)
 		{
 			float asteriodSpeed;
 			float randomSpeed = RandomRangeFloat(asteroidSpeedMin, asteroidSpeedMax);
-			switch (behavior->origin)
+			switch (this->origin)
 			{
 			 case cAsteroidOriginTlc:
 			 {
@@ -252,20 +161,25 @@ Behavior* BehaviorAsteroidCreate(void)
 			asteriodSpeed = Vector2DLength(&velocity);
 			asteriodSpeed *= randomSpeed;
 			Vector2DScale(&velocity, &velocity, asteriodSpeed);
-			PhysicsSetVelocity(entityPhysics,&velocity);
+			entityPhysics->PhysicsSetVelocity(&velocity);
 		}
 	}
 }
-static void BehaviorAsteroidCollisionHandler(Entity* obj1, const Entity* obj2)
+void BehaviorAsteroid::BehaviorAsteroidCollisionHandler(Entity* obj1, const Entity* obj2)
 {
 	if (obj1 && obj2)
 	{
-		if ((!strncmp(EntityGetName(obj2), "Bullet", _countof("Bullet"))) || ((!strncmp(EntityGetName(obj2), "SpaceShip", _countof("SpaceShip")))))
+		if ((!strncmp(obj2->EntityGetName(), "Bullet", _countof("Bullet"))) || ((!strncmp(obj2->EntityGetName(), "SpaceShip", _countof("SpaceShip")))))
 		{ 
 			ScoreSystemIncreaseScore(20); 
-			EntityDestroy(obj1);
+			obj1->EntityDestroy();
 		}
 	}
+}
+
+BehaviorAsteroid* BehaviorAsteroid::Clone() const
+{
+	return new BehaviorAsteroid(*this);
 }
 //------------------------------------------------------------------------------
 // Private Functions:

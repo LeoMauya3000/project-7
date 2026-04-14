@@ -18,96 +18,44 @@
 #include "DGL.h"
 #include "Vector2D.h"
 #include "Entity.h"
-typedef struct ColliderCircle
+
+
+void ColliderCircle::ColliderCircleRead(Stream stream)
 {
-	// Inherit the base collider structure.
-	Collider	base;
-
-	// Radius of the circle collider.
-	float radius;
-
-} ColliderCircle;
-
-//------------------------------------------------------------------------------
-// Private Constants:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Structures:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Private Function Declarations:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Functions:
-//------------------------------------------------------------------------------
-
-// Initialize the ...
-Collider* ColliderCircleCreate(void)
-{
-	ColliderCircle* circleCollider = calloc(1, sizeof(ColliderCircle));
-	if (circleCollider)
+	if (this && stream)
 	{
-		circleCollider->base.memorySize = sizeof(ColliderCircle);
-		circleCollider->base.type = ColliderTypeCircle;
-		circleCollider->radius = 0.5f;
-		return (Collider*)circleCollider;
-	}
-	else
-	{
-		return NULL;
+		float _radius = StreamReadFloat(stream);
+		this->radius = _radius;
 	}
 }
 
-void ColliderCircleRead(Collider* collider, Stream stream)
+float ColliderCircle::ColliderCircleGetRadius()
 {
-	if (collider && stream)
+	if (this)
 	{
-		ColliderCircle* circleCollider = (ColliderCircle*)collider;
-		float radius = StreamReadFloat(stream);
-		circleCollider->radius = radius;
-
-	}
-}
-
-float ColliderCircleGetRadius(const Collider* collider)
-{
-	if (collider)
-	{
-		ColliderCircle *circleCollider = (ColliderCircle*)collider;
-		return circleCollider->radius;
+		return this->radius;
 	}
 	else
 	{
 		return 0;
 	}
 }
-void ColliderCircleSetRadius(Collider* collider, float radius)
+void ColliderCircle::ColliderCircleSetRadius(float _radius)
 {
-	if (collider)
+	if (this)
 	{
-		ColliderCircle* circleColldier = (ColliderCircle*)collider;
-		circleColldier->radius = radius;
+		this->radius = _radius;
 	}
 }
-bool ColliderCircleIsCollidingWithCircle(const Collider* collider, const Collider* other)
+bool ColliderCircle:: ColliderCircleIsCollidingWithCircle(const Collider* collider, const Collider* other)
 {
 	if (collider && other)
 	{
-		float radiusA = (TransformGetScale(EntityGetTransform(collider->parent))->x / 2.0f);
-		float radiusB = (TransformGetScale(EntityGetTransform(other->parent))->x / 2.0f);
-		Vector2D positionA = *TransformGetTranslation(EntityGetTransform(collider->parent));
-		Vector2D positionB = *TransformGetTranslation(EntityGetTransform(other->parent));
+	
+		float radiusA = (collider->Parent()->Has(Transform)->TransformGetScale()->x / 2.0f);
+		float radiusB = (other->Parent()->Has(Transform)->TransformGetScale()->x / 2.0f);
+		Vector2D positionA = *collider->Parent()->Has(Transform)->TransformGetTranslation();
+		Vector2D positionB = *other->Parent()->Has(Transform)->TransformGetTranslation();
 		float radiusSum = radiusA + radiusB;
 
 		if (Vector2DSquareDistance(&positionA, &positionB) <= radiusSum * radiusSum)
@@ -121,25 +69,8 @@ bool ColliderCircleIsCollidingWithCircle(const Collider* collider, const Collide
     }
 	return false;
 }
-void ColliderCircleInit()
+
+ColliderCircle* ColliderCircle::Clone() const
 {
+	return new ColliderCircle(*this);
 }
-
-// Update the ...
-// Params:
-//	 dt = Change in time (in seconds) since the last game loop.
-void ColliderCircleUpdate(float dt)
-{
-	/* Tell the compiler that the 'dt' variable is unused. */
-	UNREFERENCED_PARAMETER(dt);
-}
-
-// Shutdown the ...
-void ColliderCircleExit()
-{
-}
-
-//------------------------------------------------------------------------------
-// Private Functions:
-//------------------------------------------------------------------------------
-

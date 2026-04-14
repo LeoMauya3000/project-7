@@ -55,7 +55,7 @@ class Entity
 	 Entity(char* _name, bool isDestroyed);
 	 ~Entity();
 
-	 Entity& EntityClone(const Entity* other);
+	 Entity* EntityClone();
 
 	 void EntityRead(Stream stream);
 
@@ -67,7 +67,7 @@ class Entity
 
 	 void EntitySetName(const char* _name);
 
-	 const char* EntityGetName();
+	 const char* EntityGetName() const;
 
 	 bool EntityIsNamed(const char* _name) const;
 

@@ -44,14 +44,11 @@
 // Private Functions:
 //------------------------------------------------------------------------------
 
-Behavior* Behavior::Clone() const
-{
-	return new Behavior(*this);
-}
 void Behavior::BehaviorRead(Stream stream)
 {
 	if (stream)
 	{
+		
 		int _stateCurr = StreamReadInt(stream);
 		int _stateNext = StreamReadInt(stream);
 		float _timerValue = StreamReadFloat(stream);
@@ -60,6 +57,8 @@ void Behavior::BehaviorRead(Stream stream)
 		this->timer = _timerValue;
 	}
 }
+
+
 void Behavior::Update(float dt)
 {
 
@@ -67,23 +66,16 @@ void Behavior::Update(float dt)
 	{
 		if (this->stateCurr != this->stateNext)
 		{
-			if (this->onExit)
-			{
-				this->onExit(this);
-			}
+
+			onExit();
+
 			this->stateCurr = this->stateNext;
 
-		    if (this->onInit)
-			{
-				this->onInit(this);
-			}
-
+			onInit();
 		}
 
-		if (this->onUpdate)
-		{
-			this->onUpdate(this, dt);
-		}
+		 onUpdate(dt);
 	}
+
 }
 

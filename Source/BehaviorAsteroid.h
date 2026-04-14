@@ -10,33 +10,22 @@
 //------------------------------------------------------------------------------
 
 #pragma once
+#include "Behavior.h"
 
-//------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct Behavior Behavior;
-
-//------------------------------------------------------------------------------
-// Public Consts:
-//------------------------------------------------------------------------------
-
-// An example of the enum to be defined in BehaviorAsteroid.c.
-
-
-
+class Entity;
+class Component;
 class BehaviorAsteroid : public Behavior
 {
+	 enum asteriodStates
+	{
+		cAsteroidInvalid = -1,
+		cAsteroidIdle = 0,
+	};
 
-	enum
+
+public :
+	
+	enum AsteroidOrigin
 	{
 		cAsteroidOriginTlc,
 		cAsteroidOriginTrc,
@@ -45,22 +34,25 @@ class BehaviorAsteroid : public Behavior
 		cAsteroidOriginCount,
 
 	};
-public :
-	
 
-	void BehaviorAsteroidInit();
+	BehaviorAsteroid(Stream _stream)
+	{
+		this->BehaviorRead(_stream);
+		origin = (AsteroidOrigin)0;
+	}
+	void  onUpdate(float dt) override;
 
-	void BehaviorAsteroidUpdate( float dt);
-	
-	void BehaviorAsteroidSetPosition(BehaviorAsteroid* behavior);
-	void BehaviorAsteroidSetVelocity(BehaviorAsteroid* behavior);
-	
-	static void BehaviorAsteroidCollisionHandler(Entity* obj1, const Entity* obj2);
+	void  onInit() override;
+
+	void  onExit() override {}; 
+
+	BehaviorAsteroid* Clone() const override;
 
 
 private:
-
-	Behavior	base;
+	void BehaviorAsteroidSetPosition();
+	void BehaviorAsteroidSetVelocity();
+	void BehaviorAsteroidCollisionHandler(Entity* obj1, const Entity* obj2);
 	AsteroidOrigin	origin;
 
 };

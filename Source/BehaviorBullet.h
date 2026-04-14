@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 #pragma once
-
+#include "Behavior.h"
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
@@ -19,27 +19,28 @@
 //------------------------------------------------------------------------------
 // Forward References:
 //------------------------------------------------------------------------------
+class BehaviorBullet : public Behavior
+{
 
-typedef struct Behavior Behavior;
+	enum  state
+	{
+		cBulletInvalid = -1,
+		cBulletIdle
+	};
+public:
+	BehaviorBullet(Stream _stream)
+	{
+		this->BehaviorRead(_stream);
+	}
+	void onInit() override;
+	void onUpdate(float dt) override;
+	void onExit() override {};
+	BehaviorBullet* Clone() const override;
 
-//------------------------------------------------------------------------------
-// Public Consts:
-//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Public Structures:
-//------------------------------------------------------------------------------
+private:
+	
+	void BehaviorBulletUpdateLifeTimer(float dt);
+	void BehaviorBulletCollisionHandler(Entity* entity1, const Entity* entity2);
 
-//------------------------------------------------------------------------------
-// Public Variables:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Functions:
-//------------------------------------------------------------------------------
-
-// Dynamically allocate a new (Bullet) behavior component.
-// (Hint: Use calloc() to ensure that all member variables are initialized to 0.)
-Behavior* BehaviorBulletCreate(void);
-
-//------------------------------------------------------------------------------
+};

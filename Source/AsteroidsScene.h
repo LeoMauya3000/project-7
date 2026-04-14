@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	ColliderLine.h
+// File Name:	AsteriodScene.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 6
+// Project:		Project 0
 // Course:		CS230S26
 //
 // Copyright © 2026 DigiPen (USA) Corporation.
@@ -10,67 +10,51 @@
 //------------------------------------------------------------------------------
 
 #pragma once
-#include "stdafx.h"
-#define cLineSegmentMax 8
+
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
+#ifdef __cplusplus
+extern "C" {	// Assume C declarations for C++.
+#endif
 
 //------------------------------------------------------------------------------
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef FILE* Stream;
+typedef struct Scene Scene;
 
 //------------------------------------------------------------------------------
-// Public Consts:
+// Public Constants:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Public Typedefs:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
 
-// An example of the structures to be defined in ColliderLine.c.
+//------------------------------------------------------------------------------
+// Public Variables:
+//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+// Public Functions:
+//------------------------------------------------------------------------------
 
-class ColliderLine : public Collider
-{
-	struct ColliderLineSegment
-	{
-		// A single line segment (P0 and P1).
-		Vector2D	point[2];
-	};
+// Get the instance of the Stub Scene.
+// Returns:
+//	 Pointer to the base Scene structure for this derived Scene.
+const Scene* AsteriodSceneGetInstance(void);
 
-public:
-	
-	ColliderLine(Stream _stream) : Collider(ColliderTypeLine)
-	{
-        ColliderLineRead(_stream);
-	}
+//------------------------------------------------------------------------------
 
-	~ColliderLine() override {};
-
-	void ColliderLineRead(Stream stream);
-
-
-	void ColliderLineAddLineSegment(const Vector2D* p0, const Vector2D* p1);
-
-
-	bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider* other);
-
-
-	ColliderLine* Clone() const override;
-
-
-
-private:
-
-	unsigned int		lineCount;
-
-	ColliderLineSegment	lineSegments[cLineSegmentMax];
-
-};
+#ifdef __cplusplus
+}                       // End of extern "C" {
+#endif
 

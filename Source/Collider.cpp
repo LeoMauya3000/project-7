@@ -43,54 +43,28 @@
 //------------------------------------------------------------------------------
 
 // Initialize the ...
-//void ColliderRead(Collider* collider, Stream stream)
-//{
-//
-//	collider;
-//	stream;
-//}
-//void Collider::ColliderCheck(const Collider* collider, const Collider* other)
-//{
-//	/*if (collider && other)
-//	{
-//		if (ColliderIsColliding(collider, other))
-//		{
-//			if (collider->ReturnHandler())
-//			{
-//				collider->ReturnHandler()(collider->Parent(), other->Parent());
-//			}
-//			if (other->ReturnHandler())
-//			{
-//				other->ReturnHandler()(other->Parent(), collider->Parent());
-//			}
-//		}
-//	}*/
-//}
 
-Collider* Collider::Clone()const
-{
-	return new Collider(*this);
-}
+
 
 void Collider::ColliderSetCollisionHandler(CollisionEventHandler _handler)
 {
 	this->handler = _handler;
 }
 
-bool ColliderIsColliding(const Collider* collider, const Collider* other)
+bool Collider::ColliderIsColliding(const Collider* collider, const Collider* other)
 {
 	if (collider && other)
 	{
 		if (collider->ReturnColliderType() == Collider::ColliderTypeCircle && other->ReturnColliderType() == Collider::ColliderTypeCircle)
 		{
 			//local variable for test sake dattebayo!
-			/*bool returnValue = ColliderCircleIsCollidingWithCircle(collider, other);
-			return returnValue;*/
+			bool returnValue = ColliderCircleIsCollidingWithCircle(collider, other);
+			return returnValue;
 		}
 		if ((collider->ReturnColliderType() == Collider::ColliderTypeCircle && other->ReturnColliderType() == Collider::ColliderTypeLine) || (collider->ReturnColliderType() == Collider::ColliderTypeLine && other->ReturnColliderType() == Collider::ColliderTypeCircle))
 		{
-			/*bool returnvValue = ColliderLineIsCollidingWithCircle(collider, other);
-			return returnvValue;*/
+			bool returnvValue = ColliderLineIsCollidingWithCircle(collider, other);
+			return returnvValue;
 		}
 		if (collider->ReturnColliderType() == Collider::ColliderTypeLine && other->ReturnColliderType() == Collider::ColliderTypeLine)
 		{
@@ -102,6 +76,24 @@ bool ColliderIsColliding(const Collider* collider, const Collider* other)
 	else
 	{
 		return false;
+	}
+}
+
+void Collider::ColliderCheck(const Collider* collider, const Collider* other)
+{
+	if (collider && other)
+	{
+		if (ColliderIsColliding(collider, other))
+		{
+			if (collider->handler)
+			{
+				collider->handler(collider->Parent(), other->Parent());
+			}
+			if (other->handler)
+			{
+				other->handler(other->Parent(), collider->Parent());
+			}
+		}
 	}
 }
 

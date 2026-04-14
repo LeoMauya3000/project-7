@@ -39,7 +39,7 @@
 //------------------------------------------------------------------------------
 // Private Variables:
 //------------------------------------------------------------------------------
-static EntityContainer* entities = new EntityContainer();
+static EntityContainer* entities;
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ void SceneLoad(const Scene* scene)
 
 
 		// Execute the Load function.
+		entities = EntityContainerCreate();
 		MeshLibraryInit();
 		SpriteSourceLibraryInit();
 		(*scene->load)();
@@ -108,8 +109,8 @@ void SceneUpdate(const Scene* scene, float dt)
 
 		// Execute the Update function.
 		(*scene->update)(dt);
-		entities->EntityContainerUpdateAll(dt);
-		entities->EntityContainerCheckCollisions();
+		EntityContainerUpdateAll(entities,dt);
+		EntityContainerCheckCollisions(entities);
 	}
 }
 
@@ -122,7 +123,7 @@ void SceneRender(const Scene* scene)
 		// TODO: Call TraceMessage, passing the format string "%s: Render" and the name of the scene.
 		TraceMessage("%s: Render", scene->name);
 		// Execute the Render function.
-		entities->EntityContainerRenderAll();
+		EntityContainerRenderAll(entities);
 		//pretty sure im going to have to remove this 
 		(*scene->render)();
 	}
@@ -138,7 +139,7 @@ void SceneExit(const Scene* scene)
 		TraceMessage("%s: Exit", scene->name);
 		// Execute the Exit function.
 		(*scene->exit)();
-		entities->EntityContainerFreeAll();
+	   EntityContainerFreeAll(entities);
 		EntityFactoryFreeAll();
 	}
 }
@@ -153,8 +154,7 @@ void SceneUnload(const Scene* scene)
 		TraceMessage("%s: Unload", scene->name);
 		// Execute the Unload function.
 		(*scene->unload)();
-		delete entities;
-		entities = nullptr;
+		EntityContainerFreeAll(entities);
 		MeshLibraryFreeAll();
 		SpriteSourceLibraryFreeAll();
 	}
@@ -171,7 +171,7 @@ void SceneAddEntity(Entity* entity)
 {
 	if (entity)
 	{
-		entities->EntityContainerAddEntity(entity);
+		EntityContainerAddEntity(entities, entity);
 	}
 }
 
@@ -179,7 +179,7 @@ Entity* SceneFindEntityByName(const char* entityName)
 {
 	if (entityName)
 	{
-		return entities->EntityContainerFindByName(entityName);
+		return EntityContainerFindByName(entities, entityName);
 	}
 	else
 	{
